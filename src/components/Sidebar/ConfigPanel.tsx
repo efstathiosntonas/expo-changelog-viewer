@@ -1,4 +1,5 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef, ChangeEvent } from 'react';
+import { Upload } from 'lucide-react';
 import { useSDKBranches } from '@/hooks/useSDKBranches';
 import { useChangelogContext } from '@/hooks/useChangelogContext';
 import { useMobileNav } from '@/contexts/MobileNavContext';
@@ -11,10 +12,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { parsePackageJson, readFileAsText } from '@/utils/packageJsonParser';
 
 export function ConfigPanel() {
   const {
     selectedModules,
+    setSelectedModules,
     selectedBranch,
     setSelectedBranch,
     versionLimit,
@@ -33,6 +36,8 @@ export function ConfigPanel() {
   const { closeMobileNav } = useMobileNav();
   const [hasAutoLoaded, setHasAutoLoaded] = useState(false);
   const [hasSetDefaultBranch, setHasSetDefaultBranch] = useState(false);
+  const [importStatus, setImportStatus] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   /* Update selectedBranch to defaultBranch if it's still in 'main' and we have a better default */
   useEffect(() => {
@@ -81,100 +86,185 @@ export function ConfigPanel() {
     loadChangelogs(selectedModules, selectedBranch, false).catch(console.log);
   };
 
+  const handleFileImport = async (event: ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    try {
+      setImportStatus('Reading file...');
+      const content = await readFileAsText(file);
+      const result = parsePackageJson(content);
+
+      if (result.matched.length === 0) {
+        setImportStatus('⚠️ No Expo modules found in package.json');
+        setTimeout(() => setImportStatus(null), 3000);
+        return;
+      }
+
+      /* Auto-select matched modules */
+      setSelectedModules((prev: string[]) => [...new Set([...prev, ...result.matched])]);
+
+      const message = `✓ ${result.matched.length} module${result.matched.length !== 1 ? 's' : ''} selected${
+        result.unmatched.length > 0 ? ` (${result.unmatched.length} unmatched)` : ''
+      }`;
+      setImportStatus(message);
+      setTimeout(() => setImportStatus(null), 3000);
+    } catch (error) {
+      console.log(error);
+      setImportStatus('❌ Invalid package.json file');
+      setTimeout(() => setImportStatus(null), 3000);
+    }
+
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  };
+
   return (
-    <div className="p-4 space-y-4 border-b">
-      <div>
-        <label className="text-xs font-semibold uppercase text-muted-foreground mb-2 block">
-          SDK Version
-        </label>
-        <Select
-          value={selectedBranch}
-          onValueChange={handleBranchChange}
-          disabled={loadingVersions}
-        >
-          <SelectTrigger>
-            <SelectValue placeholder="Select SDK" />
-          </SelectTrigger>
-          <SelectContent>
-            {sdkVersions.map((v) => (
-              <SelectItem key={v.value} value={v.value}>
-                {v.label}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+    <>
+      <div className="px-4 py-5 space-y-4 border-b">
+        <div>
+          <label className="text-xs font-semibold uppercase text-muted-foreground mb-2 block">
+            SDK Version
+          </label>
+          <Select
+            value={selectedBranch}
+            onValueChange={handleBranchChange}
+            disabled={loadingVersions}
+          >
+            <SelectTrigger>
+              <SelectValue placeholder="Select SDK" />
+            </SelectTrigger>
+            <SelectContent>
+              {sdkVersions.map((v) => (
+                <SelectItem key={v.value} value={v.value}>
+                  {v.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+
+        <div>
+          <label className="text-xs font-semibold uppercase text-muted-foreground mb-2 block">
+            Version Limit
+          </label>
+          <Select
+            value={versionLimit.toString()}
+            onValueChange={(val) => setVersionLimit(val === 'all' ? 'all' : parseInt(val))}
+          >
+            <SelectTrigger>
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="1">Latest only</SelectItem>
+              <SelectItem value="2">Last 2</SelectItem>
+              <SelectItem value="3">Last 3</SelectItem>
+              <SelectItem value="4">Last 4</SelectItem>
+              <SelectItem value="5">Last 5</SelectItem>
+              <SelectItem value="6">Last 6</SelectItem>
+              <SelectItem value="7">Last 7</SelectItem>
+              <SelectItem value="8">Last 8</SelectItem>
+              <SelectItem value="9">Last 9</SelectItem>
+              <SelectItem value="10">Last 10</SelectItem>
+              <SelectItem value="all">All versions</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+
+        <div>
+          <label className="text-xs font-semibold uppercase text-muted-foreground mb-2 block">
+            Date Filter
+          </label>
+          <Select value={dateFilter} onValueChange={setDateFilter}>
+            <SelectTrigger>
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All time</SelectItem>
+              <SelectItem value="last-7-days">Last 7 days</SelectItem>
+              <SelectItem value="last-30-days">Last 30 days</SelectItem>
+              <SelectItem value="last-90-days">Last 90 days</SelectItem>
+              <SelectItem value="after-last-visit">After last visit ⭐</SelectItem>
+            </SelectContent>
+          </Select>
+          {dateFilter !== 'all' && versionLimit !== 'all' && versionLimit < 5 && (
+            <p className="text-xs text-amber-600 dark:text-amber-400 mt-1.5 flex items-start gap-1">
+              <span className="mt-0.5">⚠️</span>
+              <span>
+                Version limit may hide filtered versions. Consider increasing limit or set to
+                &quot;All versions&quot;.
+              </span>
+            </p>
+          )}
+        </div>
+
+        <div className="flex items-center gap-2">
+          <Checkbox
+            id="hide-unchanged"
+            checked={hideUnchanged}
+            onCheckedChange={setHideUnchanged}
+          />
+          <label htmlFor="hide-unchanged" className="text-sm cursor-pointer select-none">
+            Hide unchanged versions
+          </label>
+        </div>
       </div>
 
-      <div>
-        <label className="text-xs font-semibold uppercase text-muted-foreground mb-2 block">
-          Version Limit
-        </label>
-        <Select
-          value={versionLimit.toString()}
-          onValueChange={(val) => setVersionLimit(val === 'all' ? 'all' : parseInt(val))}
-        >
-          <SelectTrigger>
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="1">Latest only</SelectItem>
-            <SelectItem value="2">Last 2</SelectItem>
-            <SelectItem value="3">Last 3</SelectItem>
-            <SelectItem value="4">Last 4</SelectItem>
-            <SelectItem value="5">Last 5</SelectItem>
-            <SelectItem value="6">Last 6</SelectItem>
-            <SelectItem value="7">Last 7</SelectItem>
-            <SelectItem value="8">Last 8</SelectItem>
-            <SelectItem value="9">Last 9</SelectItem>
-            <SelectItem value="10">Last 10</SelectItem>
-            <SelectItem value="all">All versions</SelectItem>
-          </SelectContent>
-        </Select>
-      </div>
+      <div className="border-t" />
 
-      <div>
-        <label className="text-xs font-semibold uppercase text-muted-foreground mb-2 block">
-          Date Filter
-        </label>
-        <Select value={dateFilter} onValueChange={setDateFilter}>
-          <SelectTrigger>
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">All time</SelectItem>
-            <SelectItem value="last-7-days">Last 7 days</SelectItem>
-            <SelectItem value="last-30-days">Last 30 days</SelectItem>
-            <SelectItem value="last-90-days">Last 90 days</SelectItem>
-            <SelectItem value="after-last-visit">After last visit ⭐</SelectItem>
-          </SelectContent>
-        </Select>
-        {dateFilter !== 'all' && versionLimit !== 'all' && versionLimit < 5 && (
-          <p className="text-xs text-amber-600 dark:text-amber-400 mt-1.5 flex items-start gap-1">
-            <span className="mt-0.5">⚠️</span>
-            <span>
-              Version limit may hide filtered versions. Consider increasing limit or set to
-              &quot;All versions&quot;.
-            </span>
+      <div className="px-4 py-5 space-y-4 border-b">
+        <div className="space-y-2">
+          <div className="relative">
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept=".json,application/json"
+              onChange={handleFileImport}
+              className="hidden"
+              aria-label="Upload package.json"
+            />
+            <Button
+              variant="outline"
+              onClick={() => fileInputRef.current?.click()}
+              className="w-full border-purple-500 text-purple-600 hover:bg-purple-50 dark:border-purple-400 dark:text-purple-400 dark:hover:bg-purple-950"
+            >
+              <Upload className="h-4 w-4 mr-2" />
+              Import from package.json
+            </Button>
+          </div>
+          <p className="text-xs text-muted-foreground text-center">
+            🔒 100% private - processed locally in your browser
           </p>
-        )}
+          {importStatus && (
+            <p
+              className={`text-xs text-center py-1 px-2 rounded ${
+                importStatus.startsWith('❌')
+                  ? 'bg-red-100 dark:bg-red-950 text-red-700 dark:text-red-300'
+                  : importStatus.startsWith('⚠️')
+                    ? 'bg-amber-100 dark:bg-amber-950 text-amber-700 dark:text-amber-300'
+                    : 'bg-green-100 dark:bg-green-950 text-green-700 dark:text-green-300'
+              }`}
+            >
+              {importStatus}
+            </p>
+          )}
+        </div>
       </div>
 
-      <div className="flex items-center gap-2 pt-2">
-        <Checkbox id="hide-unchanged" checked={hideUnchanged} onCheckedChange={setHideUnchanged} />
-        <label htmlFor="hide-unchanged" className="text-sm cursor-pointer select-none">
-          Hide unchanged versions
-        </label>
-      </div>
+      <div className="border-t" />
 
-      <Button
-        onClick={handleLoad}
-        disabled={loading || selectedModules.length === 0}
-        className="w-full"
-      >
-        {loading
-          ? 'Loading...'
-          : `Load ${selectedModules.length} Module${selectedModules.length !== 1 ? 's' : ''}`}
-      </Button>
-    </div>
+      <div className="px-4 py-5">
+        <Button
+          onClick={handleLoad}
+          disabled={loading || selectedModules.length === 0}
+          className="w-full"
+        >
+          {loading
+            ? 'Loading...'
+            : `Load ${selectedModules.length} Module${selectedModules.length !== 1 ? 's' : ''}`}
+        </Button>
+      </div>
+    </>
   );
 }
