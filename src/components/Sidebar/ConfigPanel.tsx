@@ -162,7 +162,7 @@ export function ConfigPanel() {
       <div className="flex items-center gap-2 pt-2">
         <Checkbox id="hide-unchanged" checked={hideUnchanged} onCheckedChange={setHideUnchanged} />
         <label htmlFor="hide-unchanged" className="text-sm cursor-pointer select-none">
-          Hide unchanged modules
+          Hide unchanged versions
         </label>
       </div>
 
