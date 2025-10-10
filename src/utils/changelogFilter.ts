@@ -1,7 +1,7 @@
 export interface ChangelogVersion {
-  version: string;
   content: string;
   date?: Date | null;
+  version: string;
 }
 
 /**

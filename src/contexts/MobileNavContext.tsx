@@ -1,9 +1,9 @@
 import { createContext, useContext, ReactNode, useState } from 'react';
 
 interface MobileNavContextType {
+  closeMobileNav: () => void;
   isOpen: boolean;
   setIsOpen: (open: boolean) => void;
-  closeMobileNav: () => void;
 }
 
 const MobileNavContext = createContext<MobileNavContextType | null>(null);
@@ -20,6 +20,7 @@ export function MobileNavProvider({ children }: { children: ReactNode }) {
   );
 }
 
+// eslint-disable-next-line react-refresh/only-export-components
 export function useMobileNav() {
   const context = useContext(MobileNavContext);
   if (!context) {

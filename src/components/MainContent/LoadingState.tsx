@@ -31,7 +31,7 @@ export function LoadingState({ children }: LoadingStateProps) {
               fetched)
             </p>
           </div>
-          <Progress value={progressPercent} className="w-full" />
+          <Progress className="w-full" value={progressPercent} />
         </div>
       </div>
     );

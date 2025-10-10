@@ -3,8 +3,8 @@ import { Button } from '@/components/ui/button';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 
 interface ModuleSelectionActionsProps {
-  onSelectAll: () => void;
   onClearAll: () => void;
+  onSelectAll: () => void;
 }
 
 export function ModuleSelectionActions({ onSelectAll, onClearAll }: ModuleSelectionActionsProps) {
@@ -19,7 +19,7 @@ export function ModuleSelectionActions({ onSelectAll, onClearAll }: ModuleSelect
             Module Selection
             <Tooltip>
               <TooltipTrigger asChild>
-                <button type="button" className="hover:text-foreground transition-colors">
+                <button className="hover:text-foreground transition-colors" type="button">
                   <HelpCircle className="h-3 w-3" />
                 </button>
               </TooltipTrigger>
@@ -36,10 +36,10 @@ export function ModuleSelectionActions({ onSelectAll, onClearAll }: ModuleSelect
         </div>
       </div>
       <div className="flex gap-2">
-        <Button variant="outline" size="sm" onClick={onSelectAll} className="flex-1">
+        <Button className="flex-1" onClick={onSelectAll} size="sm" variant="outline">
           Select All
         </Button>
-        <Button variant="outline" size="sm" onClick={onClearAll} className="flex-1">
+        <Button className="flex-1" onClick={onClearAll} size="sm" variant="outline">
           Clear
         </Button>
       </div>

@@ -132,8 +132,8 @@ export function ConfigPanel() {
             <Tooltip>
               <TooltipTrigger asChild>
                 <button
-                  type="button"
                   className="text-muted-foreground hover:text-foreground transition-colors"
+                  type="button"
                 >
                   <HelpCircle className="h-3.5 w-3.5" />
                 </button>
@@ -148,9 +148,9 @@ export function ConfigPanel() {
             </Tooltip>
           </div>
           <Select
-            value={selectedBranch}
-            onValueChange={handleBranchChange}
             disabled={loadingVersions}
+            onValueChange={handleBranchChange}
+            value={selectedBranch}
           >
             <SelectTrigger>
               <SelectValue placeholder="Select SDK" />
@@ -173,8 +173,8 @@ export function ConfigPanel() {
             <Tooltip>
               <TooltipTrigger asChild>
                 <button
-                  type="button"
                   className="text-muted-foreground hover:text-foreground transition-colors"
+                  type="button"
                 >
                   <HelpCircle className="h-3.5 w-3.5" />
                 </button>
@@ -190,8 +190,8 @@ export function ConfigPanel() {
             </Tooltip>
           </div>
           <Select
-            value={versionLimit.toString()}
             onValueChange={(val) => setVersionLimit(val === 'all' ? 'all' : parseInt(val))}
+            value={versionLimit.toString()}
           >
             <SelectTrigger>
               <SelectValue />
@@ -220,8 +220,8 @@ export function ConfigPanel() {
             <Tooltip>
               <TooltipTrigger asChild>
                 <button
-                  type="button"
                   className="text-muted-foreground hover:text-foreground transition-colors"
+                  type="button"
                 >
                   <HelpCircle className="h-3.5 w-3.5" />
                 </button>
@@ -238,7 +238,7 @@ export function ConfigPanel() {
               </TooltipContent>
             </Tooltip>
           </div>
-          <Select value={dateFilter} onValueChange={setDateFilter}>
+          <Select onValueChange={setDateFilter} value={dateFilter}>
             <SelectTrigger>
               <SelectValue />
             </SelectTrigger>
@@ -263,18 +263,18 @@ export function ConfigPanel() {
 
         <div className="flex items-center gap-2">
           <Checkbox
-            id="hide-unchanged"
             checked={hideUnchanged}
+            id="hide-unchanged"
             onCheckedChange={setHideUnchanged}
           />
-          <label htmlFor="hide-unchanged" className="text-sm cursor-pointer select-none">
+          <label className="text-sm cursor-pointer select-none" htmlFor="hide-unchanged">
             Hide unchanged versions
           </label>
           <Tooltip>
             <TooltipTrigger asChild>
               <button
-                type="button"
                 className="text-muted-foreground hover:text-foreground transition-colors"
+                type="button"
               >
                 <HelpCircle className="h-3.5 w-3.5" />
               </button>
@@ -296,18 +296,18 @@ export function ConfigPanel() {
         <div className="space-y-2">
           <div className="relative">
             <input
+              accept=".json,application/json"
+              aria-label="Upload package.json"
+              className="hidden"
+              onChange={handleFileImport}
               ref={fileInputRef}
               type="file"
-              accept=".json,application/json"
-              onChange={handleFileImport}
-              className="hidden"
-              aria-label="Upload package.json"
             />
             <div className="flex items-center gap-2">
               <Button
-                variant="outline"
-                onClick={() => fileInputRef.current?.click()}
                 className="flex-1 border-purple-500 text-purple-600 hover:bg-purple-50 dark:border-purple-400 dark:text-purple-400 dark:hover:bg-purple-950"
+                onClick={() => fileInputRef.current?.click()}
+                variant="outline"
               >
                 <Upload className="h-4 w-4 mr-2" />
                 Import from package.json
@@ -315,8 +315,8 @@ export function ConfigPanel() {
               <Tooltip>
                 <TooltipTrigger asChild>
                   <button
-                    type="button"
                     className="text-muted-foreground hover:text-foreground transition-colors"
+                    type="button"
                   >
                     <HelpCircle className="h-3.5 w-3.5" />
                   </button>
@@ -354,9 +354,9 @@ export function ConfigPanel() {
 
       <div className="px-4 py-5">
         <Button
-          onClick={handleLoad}
-          disabled={loading || selectedModules.length === 0}
           className="w-full"
+          disabled={loading || selectedModules.length === 0}
+          onClick={handleLoad}
         >
           {loading
             ? 'Loading...'

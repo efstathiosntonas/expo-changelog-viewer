@@ -133,9 +133,9 @@ export const ChangelogItem = forwardRef<ChangelogItemRef, ChangelogItemProps>(
           <div className="flex items-start sm:items-center gap-2 md:gap-3 flex-1 min-w-0">
             <CollapsibleTrigger asChild>
               <Button
-                variant="ghost"
-                size="icon"
                 className="h-7 w-7 md:h-8 md:w-8 flex-shrink-0 mt-0.5 sm:mt-0"
+                size="icon"
+                variant="ghost"
               >
                 <ChevronRight
                   className={`h-4 w-4 transition-transform ${isExpanded ? 'rotate-90' : ''}`}
@@ -148,22 +148,22 @@ export const ChangelogItem = forwardRef<ChangelogItemRef, ChangelogItemProps>(
                   {changelog.module}
                 </h3>
                 {changelog.cached && (
-                  <Badge variant="success" className="text-xs flex-shrink-0">
+                  <Badge className="text-xs flex-shrink-0" variant="success">
                     Cached {cacheLabel}
                   </Badge>
                 )}
                 {!changelog.cached && !changelog.error && (
-                  <Badge variant="success" className="text-xs flex-shrink-0">
+                  <Badge className="text-xs flex-shrink-0" variant="success">
                     Just fetched ✓
                   </Badge>
                 )}
                 {dateFilter === 'after-last-visit' && newVersionCount > 0 && (
-                  <Badge variant="default" className="text-xs flex-shrink-0">
+                  <Badge className="text-xs flex-shrink-0" variant="default">
                     {newVersionCount} new
                   </Badge>
                 )}
                 {hasNoChanges && (
-                  <Badge variant="outline" className="text-xs flex-shrink-0">
+                  <Badge className="text-xs flex-shrink-0" variant="outline">
                     No user-facing changes
                   </Badge>
                 )}
@@ -171,7 +171,7 @@ export const ChangelogItem = forwardRef<ChangelogItemRef, ChangelogItemProps>(
                   dateFilter !== 'all' &&
                   cutoffDate &&
                   filteredByDate.length === 0 && (
-                    <Badge variant="outline" className="text-xs flex-shrink-0">
+                    <Badge className="text-xs flex-shrink-0" variant="outline">
                       No changes in filter
                     </Badge>
                   )}
@@ -205,11 +205,11 @@ export const ChangelogItem = forwardRef<ChangelogItemRef, ChangelogItemProps>(
           <div className="px-3 md:px-5 pb-4 md:pb-5 border-t pt-3 md:pt-4">
             <div className="prose dark:prose-invert max-w-none prose-sm">
               <ReactMarkdown
-                remarkPlugins={[remarkGfm]}
-                rehypePlugins={[rehypeRaw]}
                 components={{
-                  a: ({ ...props }) => <a {...props} target="_blank" rel="noopener noreferrer" />,
+                  a: ({ ...props }) => <a {...props} rel="noopener noreferrer" target="_blank" />,
                 }}
+                rehypePlugins={[rehypeRaw]}
+                remarkPlugins={[remarkGfm]}
               >
                 {displayContent || 'No changelog content available'}
               </ReactMarkdown>

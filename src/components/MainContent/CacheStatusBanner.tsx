@@ -17,24 +17,24 @@ export function CacheStatusBanner() {
       <div className="flex items-center gap-3">
         <div className="text-sm">
           <span className="font-semibold text-foreground">Cache Status:</span>{' '}
-          <Badge variant="success" className="ml-2">
+          <Badge className="ml-2" variant="success">
             {cachedCount} Cached
           </Badge>
-          <Badge variant="default" className="ml-2">
+          <Badge className="ml-2" variant="default">
             {freshCount} Fresh
           </Badge>
           {errors.length > 0 && (
-            <Badge variant="destructive" className="ml-2">
+            <Badge className="ml-2" variant="destructive">
               {errors.length} Failed
             </Badge>
           )}
         </div>
       </div>
       <Button
-        variant="outline"
-        size="sm"
-        onClick={() => loadChangelogs(selectedModules, selectedBranch, true)}
         disabled={loading}
+        onClick={() => loadChangelogs(selectedModules, selectedBranch, true)}
+        size="sm"
+        variant="outline"
       >
         <RefreshCw className="h-4 w-4 mr-2" />
         Fetch Fresh

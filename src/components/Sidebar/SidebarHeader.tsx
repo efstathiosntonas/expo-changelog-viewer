@@ -30,18 +30,18 @@ export function SidebarHeader() {
     <div className="p-5 pr-12 md:pr-5 border-b flex items-center justify-between">
       <h1 className="text-lg font-bold">Expo Changelogs Viewer</h1>
       <div className="flex gap-1">
-        <Button variant="ghost" size="icon" title="View on GitHub" asChild>
+        <Button asChild size="icon" title="View on GitHub" variant="ghost">
           <a
             href="https://github.com/efstathiosntonas/expo-changelog-viewer"
-            target="_blank"
             rel="noopener noreferrer"
+            target="_blank"
           >
             <Github className="h-4 w-4" />
           </a>
         </Button>
-        <AlertDialog open={clearDialogOpen} onOpenChange={setClearDialogOpen}>
+        <AlertDialog onOpenChange={setClearDialogOpen} open={clearDialogOpen}>
           <AlertDialogTrigger asChild>
-            <Button variant="ghost" size="icon" title="Clear storage and cache">
+            <Button size="icon" title="Clear storage and cache" variant="ghost">
               <Trash2 className="h-4 w-4" />
             </Button>
           </AlertDialogTrigger>
@@ -62,7 +62,7 @@ export function SidebarHeader() {
             </AlertDialogFooter>
           </AlertDialogContent>
         </AlertDialog>
-        <Button variant="ghost" size="icon" onClick={toggleTheme} title={`Theme: ${theme}`}>
+        <Button onClick={toggleTheme} size="icon" title={`Theme: ${theme}`} variant="ghost">
           {theme === 'dark' ? (
             <Moon className="h-4 w-4" />
           ) : theme === 'light' ? (

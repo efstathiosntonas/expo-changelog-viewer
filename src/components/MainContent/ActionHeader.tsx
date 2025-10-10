@@ -9,9 +9,9 @@ import { getDateFilterCutoff } from '@/utils/dateFilter';
 import { useMemo } from 'react';
 
 interface ActionHeaderProps {
+  allExpanded: boolean;
   onCollapseAll: () => void;
   onExport: () => void;
-  allExpanded: boolean;
 }
 
 export function ActionHeader({ onCollapseAll, onExport, allExpanded }: ActionHeaderProps) {
@@ -58,13 +58,13 @@ export function ActionHeader({ onCollapseAll, onExport, allExpanded }: ActionHea
       </div>
       <div className="flex gap-2 md:gap-3 w-full sm:w-auto">
         <Button
-          variant="outline"
-          onClick={onCollapseAll}
           className="flex-1 sm:flex-none text-sm md:text-base"
+          onClick={onCollapseAll}
+          variant="outline"
         >
           {allExpanded ? 'Collapse All' : 'Expand All'}
         </Button>
-        <Button onClick={onExport} className="flex-1 sm:flex-none text-sm md:text-base">
+        <Button className="flex-1 sm:flex-none text-sm md:text-base" onClick={onExport}>
           Export Markdown
         </Button>
       </div>

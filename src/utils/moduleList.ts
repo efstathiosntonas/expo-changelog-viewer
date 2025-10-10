@@ -1,6 +1,6 @@
 export interface ExpoModule {
-  name: string;
   category: string;
+  name: string;
 }
 
 export const EXPO_MODULES: ExpoModule[] = [

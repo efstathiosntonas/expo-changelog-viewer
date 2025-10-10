@@ -6,9 +6,9 @@ export type DateFilterType =
   | 'after-last-visit';
 
 export interface VersionWithDate {
-  version: string;
-  date: Date | null;
   content: string;
+  date: Date | null;
+  version: string;
 }
 
 /**
@@ -47,7 +47,7 @@ export function parseVersionsWithDates(content: string): VersionWithDate[] {
   const versionRegex = /^#\s+(.+)$/gm;
   const versions: VersionWithDate[] = [];
   let match;
-  const matches: { version: string; index: number }[] = [];
+  const matches: { index: number; version: string }[] = [];
 
   while ((match = versionRegex.exec(content)) !== null) {
     matches.push({ version: match[1], index: match.index });

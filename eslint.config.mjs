@@ -4,6 +4,7 @@ import tseslint from 'typescript-eslint';
 import reactPlugin from 'eslint-plugin-react';
 import reactHooksPlugin from 'eslint-plugin-react-hooks';
 import reactRefreshPlugin from 'eslint-plugin-react-refresh';
+import typescriptSortKeys from 'eslint-plugin-typescript-sort-keys';
 import prettierConfig from 'eslint-config-prettier';
 
 export default defineConfig([
@@ -29,6 +30,7 @@ export default defineConfig([
       react: reactPlugin,
       'react-hooks': reactHooksPlugin,
       'react-refresh': reactRefreshPlugin,
+      'typescript-sort-keys': typescriptSortKeys,
     },
     languageOptions: {
       parserOptions: {
@@ -54,6 +56,9 @@ export default defineConfig([
       ...reactHooksPlugin.configs.recommended.rules,
       'react-refresh/only-export-components': ['warn', { allowConstantExport: true }],
       'react/prop-types': 'off',
+      'react/jsx-sort-props': 'error',
+      'typescript-sort-keys/interface': 'warn',
+      'typescript-sort-keys/string-enum': 'warn',
     },
   },
   prettierConfig,

@@ -56,7 +56,7 @@ const SheetContent = React.forwardRef<
 >(({ side = 'right', className, children, ...props }, ref) => (
   <SheetPortal>
     <SheetOverlay />
-    <SheetPrimitive.Content ref={ref} className={cn(sheetVariants({ side }), className)} {...props}>
+    <SheetPrimitive.Content className={cn(sheetVariants({ side }), className)} ref={ref} {...props}>
       {children}
       <SheetPrimitive.Close className="absolute right-3 top-3.5 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-secondary z-50 p-2">
         <X className="h-5 w-5" strokeWidth={2.5} />
@@ -85,8 +85,8 @@ const SheetTitle = React.forwardRef<
   React.ComponentPropsWithoutRef<typeof SheetPrimitive.Title>
 >(({ className, ...props }, ref) => (
   <SheetPrimitive.Title
-    ref={ref}
     className={cn('text-lg font-semibold text-foreground', className)}
+    ref={ref}
     {...props}
   />
 ));
@@ -97,8 +97,8 @@ const SheetDescription = React.forwardRef<
   React.ComponentPropsWithoutRef<typeof SheetPrimitive.Description>
 >(({ className, ...props }, ref) => (
   <SheetPrimitive.Description
-    ref={ref}
     className={cn('text-sm text-muted-foreground', className)}
+    ref={ref}
     {...props}
   />
 ));

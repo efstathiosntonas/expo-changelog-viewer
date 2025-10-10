@@ -11,11 +11,11 @@ const TTL_CONFIG = {
 };
 
 export interface ChangelogResult {
-  module: string;
+  cached: boolean;
   content: string;
   error?: string;
-  cached: boolean;
   fetchedAt?: number;
+  module: string;
 }
 
 /**

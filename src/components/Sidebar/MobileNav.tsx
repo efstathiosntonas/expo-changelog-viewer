@@ -10,17 +10,17 @@ export function MobileNav() {
   return (
     <>
       <div className="md:hidden fixed top-0 left-0 right-0 z-40 flex items-center gap-3 p-4 border-b bg-background">
-        <Button variant="ghost" size="icon" onClick={() => setIsOpen(true)}>
+        <Button onClick={() => setIsOpen(true)} size="icon" variant="ghost">
           <Menu className="h-5 w-5" />
           <span className="sr-only">Toggle menu</span>
         </Button>
         <h1 className="text-lg font-semibold">Expo Changelogs Viewer</h1>
       </div>
 
-      <Sheet open={isOpen} onOpenChange={setIsOpen}>
+      <Sheet onOpenChange={setIsOpen} open={isOpen}>
         <SheetContent
-          side="left"
           className="w-[85vw] sm:w-[385px] p-0 bg-[hsl(var(--background))] flex flex-col"
+          side="left"
         >
           <div className="overflow-y-auto flex-1">
             <SidebarContent isMobile />

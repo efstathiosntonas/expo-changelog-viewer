@@ -17,8 +17,8 @@ export interface ChangelogContextType {
   hideUnchanged: boolean;
   isInitializing: boolean;
   loadChangelogs: (modules: string[], branch: string, forceRefresh?: boolean) => Promise<void>;
-  loading: boolean;
   loadProgress: LoadProgress;
+  loading: boolean;
   moduleLastViewed: Record<string, number>;
   selectedBranch: string;
   selectedModules: string[];

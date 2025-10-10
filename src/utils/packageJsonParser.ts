@@ -2,8 +2,8 @@ import { EXPO_MODULES } from './moduleList';
 
 export interface PackageJsonParseResult {
   matched: string[];
-  unmatched: string[];
   total: number;
+  unmatched: string[];
 }
 
 /**

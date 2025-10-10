@@ -1,8 +1,8 @@
 import { SDK_VERSIONS } from '@/utils/moduleList.ts';
 
 export interface SDKVersion {
-  value: string;
   label: string;
+  value: string;
 }
 
 /**

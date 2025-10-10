@@ -5,11 +5,11 @@ const DB_VERSION = 3; /* Bump to force re-hydration if cache structure changes *
 const STORE_NAME = 'changelogs';
 
 export interface CachedChangelog {
-  key: string;
-  module: string;
   branch: string;
   content: string;
   fetchedAt: number;
+  key: string;
+  module: string;
   ttl: number;
 }
 

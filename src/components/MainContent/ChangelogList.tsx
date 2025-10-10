@@ -9,8 +9,8 @@ import {
 import { getDateFilterCutoff } from '@/utils/dateFilter';
 
 interface ChangelogListProps {
-  onToggleViewed: (moduleName: string, checked: boolean) => void;
   onCollapseAllChange?: (callback: (expanded: boolean) => void) => void;
+  onToggleViewed: (moduleName: string, checked: boolean) => void;
 }
 
 export function ChangelogList({ onToggleViewed, onCollapseAllChange }: ChangelogListProps) {
@@ -99,13 +99,13 @@ export function ChangelogList({ onToggleViewed, onCollapseAllChange }: Changelog
             className="w-16 h-16 text-muted-foreground"
             fill="none"
             stroke="currentColor"
-            viewBox="0 0 24 24"
             strokeWidth={1.5}
+            viewBox="0 0 24 24"
           >
             <path
+              d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
               strokeLinecap="round"
               strokeLinejoin="round"
-              d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
             />
           </svg>
         </div>
@@ -121,15 +121,15 @@ export function ChangelogList({ onToggleViewed, onCollapseAllChange }: Changelog
     <div className="space-y-4">
       {sortedChangelogs.map((changelog) => (
         <ChangelogItem
+          changelog={changelog}
+          defaultExpanded={true}
+          isViewed={viewedModules.includes(changelog.module)}
           key={changelog.module}
+          onToggleViewed={onToggleViewed}
           ref={(ref) => {
             itemRefs.current.set(changelog.module, ref);
           }}
-          changelog={changelog}
           versionLimit={versionLimit}
-          isViewed={viewedModules.includes(changelog.module)}
-          onToggleViewed={onToggleViewed}
-          defaultExpanded={true}
         />
       ))}
     </div>
