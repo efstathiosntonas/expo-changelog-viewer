@@ -1,5 +1,7 @@
 import { ReactNode } from 'react';
+
 import { useChangelogContext } from '@/hooks/useChangelogContext';
+
 import { Progress } from '@/components/ui/progress';
 
 interface LoadingStateProps {

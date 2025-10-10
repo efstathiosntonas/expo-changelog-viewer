@@ -1,5 +1,5 @@
 import { HelpCircle } from 'lucide-react';
-import { CATEGORIES } from '@/utils/moduleList';
+
 import { Button } from '@/components/ui/button';
 import {
   Select,
@@ -9,6 +9,8 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+
+import { CATEGORIES } from '@/utils/moduleList';
 
 interface CategoryFilterProps {
   onCategoryChange: (category: string) => void;

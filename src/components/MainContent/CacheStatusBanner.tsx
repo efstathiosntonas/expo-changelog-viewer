@@ -1,7 +1,9 @@
 import { RefreshCw } from 'lucide-react';
+
 import { useChangelogContext } from '@/hooks/useChangelogContext';
-import { Button } from '@/components/ui/button';
+
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 
 export function CacheStatusBanner() {
   const { changelogs, errors, loading, loadChangelogs, selectedModules, selectedBranch } =

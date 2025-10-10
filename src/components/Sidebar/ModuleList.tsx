@@ -1,5 +1,8 @@
-import { CATEGORIES, EXPO_MODULES, type ExpoModule } from '@/utils/moduleList';
 import { Checkbox } from '@/components/ui/checkbox';
+
+import { CATEGORIES, EXPO_MODULES } from '@/utils/moduleList';
+
+import type { ExpoModule } from '@/utils/moduleList';
 
 interface ModuleListProps {
   onToggleModule: (moduleName: string, checked: boolean) => void;

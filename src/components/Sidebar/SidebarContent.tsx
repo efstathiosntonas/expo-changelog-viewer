@@ -1,13 +1,17 @@
-import { useState, useMemo } from 'react';
-import { EXPO_MODULES } from '@/utils/moduleList';
+import { useMemo, useState } from 'react';
+
 import { useChangelogContext } from '@/hooks/useChangelogContext';
-import { SidebarHeader } from './SidebarHeader';
-import { ModuleSearch } from './ModuleSearch';
-import { ConfigPanel } from './ConfigPanel';
-import { CategorySelect } from './CategorySelect';
-import { ModuleSelectionActions } from './ModuleSelectionActions';
-import { ModuleList } from './ModuleList';
+
 import { TooltipProvider } from '@/components/ui/tooltip';
+
+import { EXPO_MODULES } from '@/utils/moduleList';
+
+import { CategorySelect } from './CategorySelect';
+import { ConfigPanel } from './ConfigPanel';
+import { ModuleList } from './ModuleList';
+import { ModuleSearch } from './ModuleSearch';
+import { ModuleSelectionActions } from './ModuleSelectionActions';
+import { SidebarHeader } from './SidebarHeader';
 
 interface SidebarContentProps {
   isMobile?: boolean;

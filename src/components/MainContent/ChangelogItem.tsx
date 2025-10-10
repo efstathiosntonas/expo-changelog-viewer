@@ -1,24 +1,28 @@
-import { useState, forwardRef, useImperativeHandle, useEffect, useMemo } from 'react';
-import ReactMarkdown from 'react-markdown';
-import remarkGfm from 'remark-gfm';
-import rehypeRaw from 'rehype-raw';
+import { forwardRef, useEffect, useImperativeHandle, useMemo, useState } from 'react';
+
 import { ChevronRight } from 'lucide-react';
+import ReactMarkdown from 'react-markdown';
+import rehypeRaw from 'rehype-raw';
+import remarkGfm from 'remark-gfm';
+
 import { type ChangelogResult } from '@/hooks/useChangelogCache';
+import { useChangelogContext } from '@/hooks/useChangelogContext';
+
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
+
 import {
-  parseChangelog,
+  combineVersions,
+  filterOutNoChangeVersions,
   filterVersions,
   filterVersionsByDate,
-  filterOutNoChangeVersions,
-  combineVersions,
   hasNoUserFacingChanges,
+  parseChangelog,
 } from '@/utils/changelogFilter';
 import { getDateFilterCutoff } from '@/utils/dateFilter';
 import { formatDatesInMarkdown } from '@/utils/dateFormatter';
-import { useChangelogContext } from '@/hooks/useChangelogContext';
-import { Button } from '@/components/ui/button';
-import { Checkbox } from '@/components/ui/checkbox';
-import { Badge } from '@/components/ui/badge';
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 
 interface ChangelogItemProps {
   changelog: ChangelogResult;

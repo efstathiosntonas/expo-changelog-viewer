@@ -1,6 +1,8 @@
 import { createContext } from 'react';
-import { type ChangelogResult } from '../hooks/useChangelogCache';
-import { type DateFilterType } from '../utils/dateFilter';
+
+import { type ChangelogResult } from '@/hooks/useChangelogCache';
+
+import { type DateFilterType } from '@/utils/dateFilter';
 
 interface LoadProgress {
   cached: number;

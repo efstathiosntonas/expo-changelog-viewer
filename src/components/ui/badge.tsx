@@ -1,7 +1,10 @@
-import { type VariantProps } from 'class-variance-authority';
-import { cn } from '@/lib/utils.ts';
-import { badgeVariants } from './badge.variants';
 import { HTMLAttributes } from 'react';
+
+import { type VariantProps } from 'class-variance-authority';
+
+import { cn } from '@/lib/utils.ts';
+
+import { badgeVariants } from './badge.variants';
 
 export interface BadgeProps
   extends HTMLAttributes<HTMLDivElement>,

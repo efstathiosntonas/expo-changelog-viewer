@@ -1,10 +1,12 @@
 import { useState } from 'react';
+
 import { useChangelogContext } from '@/hooks/useChangelogContext';
-import { CacheStatusBanner } from './CacheStatusBanner';
+
 import { ActionHeader } from './ActionHeader';
+import { CacheStatusBanner } from './CacheStatusBanner';
+import { ChangelogList } from './ChangelogList';
 import { ErrorDisplay } from './ErrorDisplay';
 import { LoadingState } from './LoadingState';
-import { ChangelogList } from './ChangelogList';
 
 export function MainContent() {
   const { changelogs, selectedBranch, setViewedModules } = useChangelogContext();

@@ -1,8 +1,9 @@
-import { ChangelogProvider } from './contexts/ChangelogContext';
-import { MobileNavProvider } from './contexts/MobileNavContext';
-import { Sidebar } from './components/Sidebar/Sidebar';
-import { MobileNav } from './components/Sidebar/MobileNav';
-import { MainContent } from './components/MainContent/MainContent';
+import { ChangelogProvider } from '@/contexts/ChangelogContext';
+import { MobileNavProvider } from '@/contexts/MobileNavContext';
+
+import { MainContent } from '@/components/MainContent/MainContent';
+import { MobileNav } from '@/components/Sidebar/MobileNav';
+import { Sidebar } from '@/components/Sidebar/Sidebar';
 
 function App() {
   return (

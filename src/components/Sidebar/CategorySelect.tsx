@@ -1,5 +1,5 @@
 import { HelpCircle } from 'lucide-react';
-import { CATEGORIES } from '@/utils/moduleList';
+
 import {
   Select,
   SelectContent,
@@ -8,6 +8,8 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
+
+import { CATEGORIES } from '@/utils/moduleList';
 
 interface CategorySelectProps {
   onCategoryChange: (category: string) => void;

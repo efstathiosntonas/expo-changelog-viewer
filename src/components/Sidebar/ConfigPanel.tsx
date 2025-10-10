@@ -1,8 +1,12 @@
-import { useEffect, useState, useRef, ChangeEvent } from 'react';
-import { Upload, HelpCircle } from 'lucide-react';
-import { useSDKBranches } from '@/hooks/useSDKBranches';
-import { useChangelogContext } from '@/hooks/useChangelogContext';
+import { ChangeEvent, useEffect, useRef, useState } from 'react';
+
+import { HelpCircle, Upload } from 'lucide-react';
+
 import { useMobileNav } from '@/contexts/MobileNavContext';
+
+import { useChangelogContext } from '@/hooks/useChangelogContext';
+import { useSDKBranches } from '@/hooks/useSDKBranches';
+
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import {
@@ -13,6 +17,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+
 import { parsePackageJson, readFileAsText } from '@/utils/packageJsonParser';
 
 export function ConfigPanel() {

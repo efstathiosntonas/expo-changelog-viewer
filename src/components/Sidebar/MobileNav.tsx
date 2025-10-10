@@ -1,8 +1,11 @@
 import { Menu } from 'lucide-react';
+
+import { useMobileNav } from '@/contexts/MobileNavContext';
+
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent } from '@/components/ui/sheet';
+
 import { SidebarContent } from './SidebarContent';
-import { useMobileNav } from '@/contexts/MobileNavContext';
 
 export function MobileNav() {
   const { isOpen, setIsOpen } = useMobileNav();

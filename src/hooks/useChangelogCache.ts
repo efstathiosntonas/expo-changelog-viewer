@@ -1,5 +1,8 @@
 import { useCallback } from 'react';
-import { useIndexedDB, type CachedChangelog } from './useIndexedDB';
+
+import { useIndexedDB } from './useIndexedDB';
+
+import type { CachedChangelog } from './useIndexedDB';
 
 const GITHUB_RAW_URL = 'https://raw.githubusercontent.com/expo/expo';
 

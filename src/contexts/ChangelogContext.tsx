@@ -1,8 +1,11 @@
 import { ReactNode, useCallback, useState } from 'react';
-import { type ChangelogResult, useChangelogCache } from '../hooks/useChangelogCache';
+
+import { useChangelogCache } from '../hooks/useChangelogCache';
 import { useLocalStorage } from '../hooks/useLocalStorage';
-import { ChangelogContext } from './ChangelogContext.context';
 import { type DateFilterType } from '../utils/dateFilter';
+import { ChangelogContext } from './ChangelogContext.context';
+
+import type { ChangelogResult } from '../hooks/useChangelogCache';
 
 interface ChangelogProviderProps {
   children: ReactNode;

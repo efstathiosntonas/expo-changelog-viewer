@@ -1,6 +1,8 @@
-import * as ProgressPrimitive from '@radix-ui/react-progress';
-import { cn } from '@/lib/utils.ts';
 import { ComponentPropsWithoutRef, ComponentRef, forwardRef } from 'react';
+
+import * as ProgressPrimitive from '@radix-ui/react-progress';
+
+import { cn } from '@/lib/utils.ts';
 
 const Progress = forwardRef<
   ComponentRef<typeof ProgressPrimitive.Root>,

@@ -1,12 +1,17 @@
-import { useMemo, useRef, useEffect } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
+
 import { useChangelogContext } from '@/hooks/useChangelogContext';
-import { ChangelogItem, type ChangelogItemRef } from './ChangelogItem';
+
 import {
-  parseChangelog,
   filterVersionsByDate,
   hasNoUserFacingChanges,
+  parseChangelog,
 } from '@/utils/changelogFilter';
 import { getDateFilterCutoff } from '@/utils/dateFilter';
+
+import { ChangelogItem } from './ChangelogItem';
+
+import type { ChangelogItemRef } from './ChangelogItem';
 
 interface ChangelogListProps {
   onCollapseAllChange?: (callback: (expanded: boolean) => void) => void;

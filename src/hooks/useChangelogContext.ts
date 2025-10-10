@@ -1,5 +1,6 @@
 import { useContext } from 'react';
-import { ChangelogContext } from '../contexts/ChangelogContext.context';
+
+import { ChangelogContext } from '@/contexts/ChangelogContext.context';
 
 export function useChangelogContext() {
   const context = useContext(ChangelogContext);
