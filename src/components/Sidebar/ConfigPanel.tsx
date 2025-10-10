@@ -139,9 +139,10 @@ export function ConfigPanel() {
                 </button>
               </TooltipTrigger>
               <TooltipContent className="max-w-xs">
-                <p>
-                  Select which Expo SDK version&apos;s changelogs to fetch. Each SDK has its own
-                  changelog branch.
+                <p className="font-semibold mb-1">Choose Expo SDK version</p>
+                <p className="text-xs">
+                  Select which SDK version&apos;s changelogs to fetch. Each SDK has its own
+                  changelog branch with version-specific updates.
                 </p>
               </TooltipContent>
             </Tooltip>
