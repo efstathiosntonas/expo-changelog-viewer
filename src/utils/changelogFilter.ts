@@ -97,6 +97,21 @@ export function filterVersionsByDate(
 }
 
 /**
+ * Filter out versions that have no user-facing changes
+ */
+export function filterOutNoChangeVersions(versions: ChangelogVersion[]): ChangelogVersion[] {
+  const noChangesPatterns = [
+    /this version does not introduce any user-facing changes/i,
+    /no user-facing changes/i,
+  ];
+
+  return versions.filter((version) => {
+    /* Keep version if it doesn't match "no changes" pattern */
+    return !noChangesPatterns.some((pattern) => pattern.test(version.content));
+  });
+}
+
+/**
  * Combines multiple version objects back into a single Markdown string
  */
 export function combineVersions(versions: ChangelogVersion[]): string {
@@ -104,14 +119,22 @@ export function combineVersions(versions: ChangelogVersion[]): string {
 }
 
 /**
- * Check if changelog has no user-facing changes
+ * Check if ALL versions in changelog have no user-facing changes
+ * Returns true only if every version contains "no user-facing changes" text
  */
 export function hasNoUserFacingChanges(content: string): boolean {
+  const versions = parseChangelog(content);
+
+  /* If no versions, consider it as having changes (don't hide) */
+  if (versions.length === 0) return false;
+
   const noChangesPatterns = [
     /this version does not introduce any user-facing changes/i,
     /no user-facing changes/i,
-    /no changes/i,
   ];
 
-  return noChangesPatterns.some((pattern) => pattern.test(content));
+  /* Check if ALL versions have no user-facing changes */
+  return versions.every((version) =>
+    noChangesPatterns.some((pattern) => pattern.test(version.content))
+  );
 }

@@ -8,6 +8,7 @@ import {
   parseChangelog,
   filterVersions,
   filterVersionsByDate,
+  filterOutNoChangeVersions,
   combineVersions,
   hasNoUserFacingChanges,
 } from '@/utils/changelogFilter';
@@ -32,33 +33,55 @@ export interface ChangelogItemRef {
 
 export const ChangelogItem = forwardRef<ChangelogItemRef, ChangelogItemProps>(
   ({ changelog, versionLimit, isViewed, onToggleViewed, defaultExpanded = false }, ref) => {
-    const { dateFilter, moduleLastViewed, setModuleLastViewed } = useChangelogContext();
+    const { dateFilter, moduleLastViewed, setModuleLastViewed, hideUnchanged } =
+      useChangelogContext();
 
-    /* Check if the changelog has no user-facing changes */
-    const hasNoChanges = useMemo(() => {
-      return hasNoUserFacingChanges(changelog.content);
-    }, [changelog.content]);
+    const [cacheLabel, setCacheLabel] = useState('');
+
+    const versions = parseChangelog(changelog.content);
+
+    /* Apply filtering pipeline */
+    const { filteredVersions, filteredByDate, cutoffDate, hasNoChanges } = useMemo(() => {
+      let filtered = versions;
+
+      /* Step 1: Filter out "no user-facing changes" versions if hideUnchanged is enabled */
+      if (hideUnchanged) {
+        filtered = filterOutNoChangeVersions(filtered);
+      }
+
+      /* Step 2: Apply date filtering */
+      const lastVisit = moduleLastViewed[changelog.module];
+      const cutoff = getDateFilterCutoff(dateFilter, lastVisit);
+      const dateFiltered = filterVersionsByDate(filtered, cutoff);
+
+      /* Step 3: Apply version limit filtering */
+      const limitFiltered = filterVersions(dateFiltered, versionLimit);
+
+      /* Check if ALL original versions have no changes */
+      const allNoChanges = hasNoUserFacingChanges(changelog.content);
+
+      return {
+        filteredVersions: limitFiltered,
+        filteredByDate: dateFiltered,
+        cutoffDate: cutoff,
+        hasNoChanges: allNoChanges,
+      };
+    }, [
+      versions,
+      hideUnchanged,
+      dateFilter,
+      moduleLastViewed,
+      changelog.module,
+      changelog.content,
+      versionLimit,
+    ]);
 
     const [isExpanded, setIsExpanded] = useState(hasNoChanges ? false : defaultExpanded);
-    const [cacheLabel, setCacheLabel] = useState('');
+    const displayContent = combineVersions(filteredVersions);
 
     useImperativeHandle(ref, () => ({
       setExpanded: (expanded: boolean) => setIsExpanded(expanded),
     }));
-
-    const versions = parseChangelog(changelog.content);
-
-    /* Apply date filtering */
-    const { filteredByDate, cutoffDate } = useMemo(() => {
-      const lastVisit = moduleLastViewed[changelog.module];
-      const cutoff = getDateFilterCutoff(dateFilter, lastVisit);
-      const filtered = filterVersionsByDate(versions, cutoff);
-      return { filteredByDate: filtered, cutoffDate: cutoff };
-    }, [versions, dateFilter, moduleLastViewed, changelog.module]);
-
-    /* Apply version limit filtering */
-    const filteredVersions = filterVersions(filteredByDate, versionLimit);
-    const displayContent = combineVersions(filteredVersions);
 
     /* Calculate how many new versions since last visit */
     const newVersionCount = useMemo(() => {
