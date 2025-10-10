@@ -58,6 +58,6 @@ export default defineConfig([
   },
   prettierConfig,
   {
-    ignores: ['dist', 'build', 'node_modules', '.yarn', '*.min.js'],
+    ignores: ['dist', 'build', 'node_modules', '.yarn', '*.min.js', '.commitlintrc.json'],
   },
 ]);

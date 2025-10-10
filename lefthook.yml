@@ -17,3 +17,9 @@ pre-push:
   commands:
     build:
       run: yarn build
+
+commit-msg:
+  parallel: true
+  commands:
+    commitlint:
+      run: ./node_modules/.bin/commitlint --edit $1
