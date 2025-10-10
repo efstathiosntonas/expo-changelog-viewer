@@ -27,30 +27,47 @@ export function ChangelogList({ onToggleViewed, onCollapseAllChange }: Changelog
 
   /* Filter and sort changelogs */
   const sortedChangelogs = useMemo(() => {
-    let filtered = changelogs;
+    const filtered = changelogs;
 
-    /* Filter out unchanged modules if enabled */
+    /* When hideUnchanged is enabled, separate modules with/without changes */
     if (hideUnchanged) {
-      filtered = changelogs.filter((c) => {
-        /* Hide modules with no user-facing changes */
-        if (hasNoUserFacingChanges(c.content)) {
-          return false;
-        }
+      /* Split into modules with changes and modules without */
+      const withChanges: typeof changelogs = [];
+      const withoutChanges: typeof changelogs = [];
 
-        /* Also filter by date if a date filter is active */
+      changelogs.forEach((c) => {
+        /* Check if module has no user-facing changes */
+        const noUserChanges = hasNoUserFacingChanges(c.content);
+
+        /* Check if module has no changes after date filtering */
+        let noDateChanges = false;
         if (dateFilter !== 'all') {
           const versions = parseChangelog(c.content);
           const lastVisit = moduleLastViewed[c.module];
           const cutoff = getDateFilterCutoff(dateFilter, lastVisit);
           const filteredVersions = filterVersionsByDate(versions, cutoff);
-          return filteredVersions.length > 0;
+          noDateChanges = filteredVersions.length === 0;
         }
 
-        return true;
+        if (noUserChanges || noDateChanges) {
+          withoutChanges.push(c);
+        } else {
+          withChanges.push(c);
+        }
       });
+
+      /* Sort each group: unviewed first, then viewed */
+      const sortGroup = (group: typeof changelogs) => {
+        const unviewed = group.filter((c) => !viewedModules.includes(c.module));
+        const viewed = group.filter((c) => viewedModules.includes(c.module));
+        return [...unviewed, ...viewed];
+      };
+
+      /* Return modules with changes first, then modules without changes at the bottom */
+      return [...sortGroup(withChanges), ...sortGroup(withoutChanges)];
     }
 
-    /* Sort: unviewed first, then viewed */
+    /* Normal sorting when hideUnchanged is disabled: unviewed first, then viewed */
     const unviewed = filtered.filter((c) => !viewedModules.includes(c.module));
     const viewed = filtered.filter((c) => viewedModules.includes(c.module));
     return [...unviewed, ...viewed];
