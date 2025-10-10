@@ -97,7 +97,13 @@ export const ChangelogItem = forwardRef<ChangelogItemRef, ChangelogItemProps>(
           return;
         }
         const age = Math.floor((Date.now() - changelog.fetchedAt) / (1000 * 60));
-        setCacheLabel(age < 60 ? `${age}m ago` : `${Math.floor(age / 60)}h ago`);
+        if (age === 0) {
+          setCacheLabel('just now');
+        } else if (age < 60) {
+          setCacheLabel(`${age}m ago`);
+        } else {
+          setCacheLabel(`${Math.floor(age / 60)}h ago`);
+        }
       };
 
       updateLabel();
@@ -147,7 +153,7 @@ export const ChangelogItem = forwardRef<ChangelogItemRef, ChangelogItemProps>(
                 )}
                 {!changelog.cached && !changelog.error && (
                   <Badge variant="success" className="text-xs flex-shrink-0">
-                    Fresh ✓
+                    Just fetched ✓
                   </Badge>
                 )}
                 {dateFilter === 'after-last-visit' && newVersionCount > 0 && (
