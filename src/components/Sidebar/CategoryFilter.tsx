@@ -22,7 +22,7 @@ export function CategoryFilter({
   onClearAll,
 }: CategoryFilterProps) {
   return (
-    <div className="p-4 border-b space-y-4">
+    <div className="px-4 py-5 border-b space-y-4">
       <div>
         <div className="relative mb-3">
           <div className="absolute inset-0 flex items-center">

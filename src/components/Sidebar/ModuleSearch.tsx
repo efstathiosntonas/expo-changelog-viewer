@@ -7,7 +7,7 @@ interface ModuleSearchProps {
 
 export function ModuleSearch({ value, onChange }: ModuleSearchProps) {
   return (
-    <div className="p-4 border-b">
+    <div className="px-4 py-5 border-b">
       <div className="relative">
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
         <input

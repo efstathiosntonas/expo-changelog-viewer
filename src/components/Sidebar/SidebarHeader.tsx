@@ -27,7 +27,7 @@ export function SidebarHeader() {
   };
 
   return (
-    <div className="p-4 pr-12 md:pr-4 border-b flex items-center justify-between">
+    <div className="p-5 pr-12 md:pr-5 border-b flex items-center justify-between">
       <h1 className="text-lg font-bold">Expo Changelogs Viewer</h1>
       <div className="flex gap-1">
         <Button variant="ghost" size="icon" title="View on GitHub" asChild>
