@@ -50,18 +50,19 @@ export function SidebarContent({ isMobile = false }: SidebarContentProps) {
     return (
       <TooltipProvider delayDuration={300}>
         <SidebarHeader />
-        <ModuleSearch value={searchTerm} onChange={setSearchTerm} />
+        <ModuleSearch onChange={setSearchTerm} value={searchTerm} />
         <ConfigPanel />
         <CategorySelect
-          selectedCategory={selectedCategory}
           onCategoryChange={setSelectedCategory}
+          selectedCategory={selectedCategory}
         />
-        <ModuleSelectionActions onSelectAll={handleSelectAll} onClearAll={handleClearAll} />
+        <ModuleSelectionActions onClearAll={handleClearAll} onSelectAll={handleSelectAll} />
         <ModuleList
-          selectedModules={selectedModules}
           onToggleModule={handleToggleModule}
           searchTerm={searchTerm}
           selectedCategory={selectedCategory}
+          selectedModules={selectedModules}
+          showCategoryFilter={false}
         />
       </TooltipProvider>
     );
@@ -74,22 +75,23 @@ export function SidebarContent({ isMobile = false }: SidebarContentProps) {
         <div className="w-1/2 border-r flex flex-col">
           <SidebarHeader />
           <div className="flex-1 overflow-y-auto">
-            <ModuleSearch value={searchTerm} onChange={setSearchTerm} />
+            <ModuleSearch onChange={setSearchTerm} value={searchTerm} />
             <ConfigPanel />
             <CategorySelect
-              selectedCategory={selectedCategory}
               onCategoryChange={setSelectedCategory}
+              selectedCategory={selectedCategory}
             />
           </div>
         </div>
         <div className="w-1/2 flex flex-col">
-          <ModuleSelectionActions onSelectAll={handleSelectAll} onClearAll={handleClearAll} />
+          <ModuleSelectionActions onClearAll={handleClearAll} onSelectAll={handleSelectAll} />
           <div className="flex-1 overflow-y-auto">
             <ModuleList
-              selectedModules={selectedModules}
               onToggleModule={handleToggleModule}
               searchTerm={searchTerm}
               selectedCategory={selectedCategory}
+              selectedModules={selectedModules}
+              showCategoryFilter={true}
             />
           </div>
         </div>

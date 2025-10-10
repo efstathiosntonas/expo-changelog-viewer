@@ -10,8 +10,8 @@ import {
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 
 interface CategorySelectProps {
-  selectedCategory: string;
   onCategoryChange: (category: string) => void;
+  selectedCategory: string;
 }
 
 export function CategorySelect({ selectedCategory, onCategoryChange }: CategorySelectProps) {
@@ -26,7 +26,7 @@ export function CategorySelect({ selectedCategory, onCategoryChange }: CategoryS
             Category Filter
             <Tooltip>
               <TooltipTrigger asChild>
-                <button type="button" className="hover:text-foreground transition-colors">
+                <button className="hover:text-foreground transition-colors" type="button">
                   <HelpCircle className="h-3 w-3" />
                 </button>
               </TooltipTrigger>
@@ -41,8 +41,10 @@ export function CategorySelect({ selectedCategory, onCategoryChange }: CategoryS
           </span>
         </div>
       </div>
-      <Select value={selectedCategory} onValueChange={onCategoryChange}>
-        <SelectTrigger>
+      <Select onValueChange={onCategoryChange} value={selectedCategory}>
+        <SelectTrigger
+          className={selectedCategory !== 'all' ? 'border-purple-500 dark:border-purple-400' : ''}
+        >
           <SelectValue />
         </SelectTrigger>
         <SelectContent>

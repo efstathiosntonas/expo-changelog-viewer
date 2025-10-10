@@ -13,6 +13,7 @@ import {
   hasNoUserFacingChanges,
 } from '@/utils/changelogFilter';
 import { getDateFilterCutoff } from '@/utils/dateFilter';
+import { formatDatesInMarkdown } from '@/utils/dateFormatter';
 import { useChangelogContext } from '@/hooks/useChangelogContext';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -21,10 +22,10 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/component
 
 interface ChangelogItemProps {
   changelog: ChangelogResult;
-  versionLimit: number | 'all';
+  defaultExpanded?: boolean;
   isViewed: boolean;
   onToggleViewed: (moduleName: string, checked: boolean) => void;
-  defaultExpanded?: boolean;
+  versionLimit: number | 'all';
 }
 
 export interface ChangelogItemRef {
@@ -77,7 +78,7 @@ export const ChangelogItem = forwardRef<ChangelogItemRef, ChangelogItemProps>(
     ]);
 
     const [isExpanded, setIsExpanded] = useState(hasNoChanges ? false : defaultExpanded);
-    const displayContent = combineVersions(filteredVersions);
+    const displayContent = formatDatesInMarkdown(combineVersions(filteredVersions));
 
     useImperativeHandle(ref, () => ({
       setExpanded: (expanded: boolean) => setIsExpanded(expanded),
@@ -124,9 +125,9 @@ export const ChangelogItem = forwardRef<ChangelogItemRef, ChangelogItemProps>(
 
     return (
       <Collapsible
-        open={isExpanded}
-        onOpenChange={setIsExpanded}
         className={`border rounded-lg bg-card transition-all ${isViewed ? 'opacity-40' : ''}`}
+        onOpenChange={setIsExpanded}
+        open={isExpanded}
       >
         <div className="p-3 md:p-4 flex items-start sm:items-center justify-between bg-[#f1f3f5] dark:bg-[#1e293b] hover:bg-[#e9ecef] dark:hover:bg-[#334155] transition-colors cursor-pointer rounded-t-lg border-b gap-2">
           <div className="flex items-start sm:items-center gap-2 md:gap-3 flex-1 min-w-0">
