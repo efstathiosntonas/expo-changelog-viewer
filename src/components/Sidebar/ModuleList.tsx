@@ -1,4 +1,4 @@
-import { EXPO_MODULES, CATEGORIES, type ExpoModule } from '@/utils/moduleList';
+import { CATEGORIES, EXPO_MODULES, type ExpoModule } from '@/utils/moduleList';
 import { Checkbox } from '@/components/ui/checkbox';
 
 interface ModuleListProps {
@@ -40,11 +40,11 @@ export function ModuleList({
   );
 
   return (
-    <div className="p-3">
+    <div className="px-3 pt-3 pb-3">
       <div className="text-xs text-muted-foreground px-2 py-2">
         {selectedModules.length} of {EXPO_MODULES.length} selected
       </div>
-      <div className="space-y-4 max-h-[calc(100vh-550px)] overflow-y-auto pr-2">
+      <div className="space-y-4">
         {selectedCategory === 'all' ? (
           CATEGORIES.map((category) => {
             const catModules = filteredModules.filter((m) => m.category === category);

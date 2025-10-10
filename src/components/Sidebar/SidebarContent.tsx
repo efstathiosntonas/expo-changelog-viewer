@@ -7,7 +7,11 @@ import { ConfigPanel } from './ConfigPanel';
 import { CategoryFilter } from './CategoryFilter';
 import { ModuleList } from './ModuleList';
 
-export function SidebarContent() {
+interface SidebarContentProps {
+  isMobile?: boolean;
+}
+
+export function SidebarContent({ isMobile = false }: SidebarContentProps) {
   const { selectedModules, setSelectedModules } = useChangelogContext();
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
@@ -36,23 +40,54 @@ export function SidebarContent() {
     setSelectedModules((prev: string[]) => prev.filter((m: string) => !allNames.includes(m)));
   };
 
+  /*
+   * On mobile: sidebar scrolls all together
+   * On desktop: header/config/filters are fixed, only module checkbox list scrolls
+   */
+  if (isMobile) {
+    return (
+      <>
+        <SidebarHeader />
+        <ModuleSearch value={searchTerm} onChange={setSearchTerm} />
+        <ConfigPanel />
+        <CategoryFilter
+          selectedCategory={selectedCategory}
+          onCategoryChange={setSelectedCategory}
+          onSelectAll={handleSelectAll}
+          onClearAll={handleClearAll}
+        />
+        <ModuleList
+          selectedModules={selectedModules}
+          onToggleModule={handleToggleModule}
+          searchTerm={searchTerm}
+          selectedCategory={selectedCategory}
+        />
+      </>
+    );
+  }
+
+  /* Desktop version with a fixed header and scrollable module list */
   return (
-    <>
-      <SidebarHeader />
-      <ModuleSearch value={searchTerm} onChange={setSearchTerm} />
-      <ConfigPanel />
-      <CategoryFilter
-        selectedCategory={selectedCategory}
-        onCategoryChange={setSelectedCategory}
-        onSelectAll={handleSelectAll}
-        onClearAll={handleClearAll}
-      />
-      <ModuleList
-        selectedModules={selectedModules}
-        onToggleModule={handleToggleModule}
-        searchTerm={searchTerm}
-        selectedCategory={selectedCategory}
-      />
-    </>
+    <div className="flex flex-col h-full">
+      <div className="flex-shrink-0">
+        <SidebarHeader />
+        <ModuleSearch value={searchTerm} onChange={setSearchTerm} />
+        <ConfigPanel />
+        <CategoryFilter
+          selectedCategory={selectedCategory}
+          onCategoryChange={setSelectedCategory}
+          onSelectAll={handleSelectAll}
+          onClearAll={handleClearAll}
+        />
+      </div>
+      <div className="flex-1 overflow-y-auto min-h-0">
+        <ModuleList
+          selectedModules={selectedModules}
+          onToggleModule={handleToggleModule}
+          searchTerm={searchTerm}
+          selectedCategory={selectedCategory}
+        />
+      </div>
+    </div>
   );
 }

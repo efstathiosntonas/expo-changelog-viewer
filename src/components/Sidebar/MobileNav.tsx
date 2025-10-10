@@ -18,9 +18,12 @@ export function MobileNav() {
       </div>
 
       <Sheet open={isOpen} onOpenChange={setIsOpen}>
-        <SheetContent side="left" className="w-[85vw] sm:w-[385px] p-0 bg-[hsl(var(--background))]">
-          <div className="overflow-y-auto h-[calc(100vh-73px)]">
-            <SidebarContent />
+        <SheetContent
+          side="left"
+          className="w-[85vw] sm:w-[385px] p-0 bg-[hsl(var(--background))] flex flex-col"
+        >
+          <div className="overflow-y-auto flex-1">
+            <SidebarContent isMobile />
           </div>
         </SheetContent>
       </Sheet>
