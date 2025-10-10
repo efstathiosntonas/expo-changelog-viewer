@@ -2,6 +2,7 @@ import { ReactNode, useCallback, useState } from 'react';
 import { type ChangelogResult, useChangelogCache } from '../hooks/useChangelogCache';
 import { useLocalStorage } from '../hooks/useLocalStorage';
 import { ChangelogContext } from './ChangelogContext.context';
+import { type DateFilterType } from '../utils/dateFilter';
 
 interface ChangelogProviderProps {
   children: ReactNode;
@@ -15,6 +16,12 @@ export function ChangelogProvider({ children }: ChangelogProviderProps) {
   const [selectedBranch, setSelectedBranch] = useLocalStorage('expo-selected-branch', 'main');
   const [versionLimit, setVersionLimit] = useLocalStorage<number | 'all'>('expo-version-limit', 1);
   const [viewedModules, setViewedModules] = useLocalStorage<string[]>('expo-viewed-modules', []);
+  const [dateFilter, setDateFilter] = useLocalStorage<DateFilterType>('expo-date-filter', 'all');
+  const [hideUnchanged, setHideUnchanged] = useLocalStorage<boolean>('expo-hide-unchanged', false);
+  const [moduleLastViewed, setModuleLastViewed] = useLocalStorage<Record<string, number>>(
+    'expo-module-last-viewed',
+    {}
+  );
 
   const [loadingState, setLoadingState] = useState({
     loading: false,
@@ -72,23 +79,29 @@ export function ChangelogProvider({ children }: ChangelogProviderProps) {
     <ChangelogContext.Provider
       value={{
         changelogs,
-        loading: loadingState.loading,
-        isInitializing: loadingState.isInitializing,
-        loadProgress: loadingState.progress,
-        errors,
-        dbReady,
-        selectedModules,
-        setSelectedModules,
-        selectedBranch,
-        setSelectedBranch,
-        versionLimit,
-        setVersionLimit,
-        viewedModules,
-        setViewedModules,
-        loadChangelogs,
         clearCache,
+        dateFilter,
+        dbReady,
+        errors,
+        hideUnchanged,
+        isInitializing: loadingState.isInitializing,
+        loadChangelogs,
+        loading: loadingState.loading,
+        loadProgress: loadingState.progress,
+        moduleLastViewed,
+        selectedBranch,
+        selectedModules,
+        setDateFilter,
+        setHideUnchanged,
         setIsInitializing: (value: boolean) =>
           setLoadingState((prev) => ({ ...prev, isInitializing: value })),
+        setModuleLastViewed,
+        setSelectedBranch,
+        setSelectedModules,
+        setVersionLimit,
+        setViewedModules,
+        versionLimit,
+        viewedModules,
       }}
     >
       {children}

@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 
 const DB_NAME = 'expo-changelog-db';
-const DB_VERSION = 2; /* Bump to force re-hydration if cache structure changes */
+const DB_VERSION = 3; /* Bump to force re-hydration if cache structure changes */
 const STORE_NAME = 'changelogs';
 
 export interface CachedChangelog {

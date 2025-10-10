@@ -1,6 +1,12 @@
 import { useMemo, useRef, useEffect } from 'react';
 import { useChangelogContext } from '@/hooks/useChangelogContext';
 import { ChangelogItem, type ChangelogItemRef } from './ChangelogItem';
+import {
+  parseChangelog,
+  filterVersionsByDate,
+  hasNoUserFacingChanges,
+} from '@/utils/changelogFilter';
+import { getDateFilterCutoff } from '@/utils/dateFilter';
 
 interface ChangelogListProps {
   onToggleViewed: (moduleName: string, checked: boolean) => void;
@@ -8,15 +14,47 @@ interface ChangelogListProps {
 }
 
 export function ChangelogList({ onToggleViewed, onCollapseAllChange }: ChangelogListProps) {
-  const { changelogs, versionLimit, viewedModules, loading, isInitializing } =
-    useChangelogContext();
+  const {
+    changelogs,
+    versionLimit,
+    viewedModules,
+    loading,
+    isInitializing,
+    dateFilter,
+    hideUnchanged,
+    moduleLastViewed,
+  } = useChangelogContext();
 
-  /* Sort: unviewed first, then viewed */
+  /* Filter and sort changelogs */
   const sortedChangelogs = useMemo(() => {
-    const unviewed = changelogs.filter((c) => !viewedModules.includes(c.module));
-    const viewed = changelogs.filter((c) => viewedModules.includes(c.module));
+    let filtered = changelogs;
+
+    /* Filter out unchanged modules if enabled */
+    if (hideUnchanged) {
+      filtered = changelogs.filter((c) => {
+        /* Hide modules with no user-facing changes */
+        if (hasNoUserFacingChanges(c.content)) {
+          return false;
+        }
+
+        /* Also filter by date if a date filter is active */
+        if (dateFilter !== 'all') {
+          const versions = parseChangelog(c.content);
+          const lastVisit = moduleLastViewed[c.module];
+          const cutoff = getDateFilterCutoff(dateFilter, lastVisit);
+          const filteredVersions = filterVersionsByDate(versions, cutoff);
+          return filteredVersions.length > 0;
+        }
+
+        return true;
+      });
+    }
+
+    /* Sort: unviewed first, then viewed */
+    const unviewed = filtered.filter((c) => !viewedModules.includes(c.module));
+    const viewed = filtered.filter((c) => viewedModules.includes(c.module));
     return [...unviewed, ...viewed];
-  }, [changelogs, viewedModules]);
+  }, [changelogs, viewedModules, hideUnchanged, dateFilter, moduleLastViewed]);
 
   const itemRefs = useRef<Map<string, ChangelogItemRef | null>>(new Map());
 

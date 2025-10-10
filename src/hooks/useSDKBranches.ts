@@ -9,7 +9,7 @@ export interface SDKVersion {
 const GITHUB_API_URL = 'https://api.github.com/repos/expo/expo/branches';
 const PER_PAGE = 100;
 const STORAGE_KEY = 'expo-sdk-branches-cache';
-const CACHE_VERSION = 2; /* Bump this when the cache structure changes for indexedDB rehydration/recreate */
+const CACHE_VERSION = 3; /* Bump this when the cache structure changes for indexedDB rehydration/recreate */
 const CACHE_TTL_HOURS = 24; /* Cache for 24 hours to avoid rate limiting */
 
 /* Helper function to process raw branch names into SDK versions with labels */

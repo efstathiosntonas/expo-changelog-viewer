@@ -1,7 +1,9 @@
 import { useEffect, useState } from 'react';
 import { useSDKBranches } from '@/hooks/useSDKBranches';
 import { useChangelogContext } from '@/hooks/useChangelogContext';
+import { useMobileNav } from '@/contexts/MobileNavContext';
 import { Button } from '@/components/ui/button';
+import { Checkbox } from '@/components/ui/checkbox';
 import {
   Select,
   SelectContent,
@@ -17,6 +19,10 @@ export function ConfigPanel() {
     setSelectedBranch,
     versionLimit,
     setVersionLimit,
+    dateFilter,
+    setDateFilter,
+    hideUnchanged,
+    setHideUnchanged,
     loading,
     loadChangelogs,
     changelogs,
@@ -24,10 +30,11 @@ export function ConfigPanel() {
     setIsInitializing,
   } = useChangelogContext();
   const { sdkVersions, defaultBranch, loading: loadingVersions } = useSDKBranches();
+  const { closeMobileNav } = useMobileNav();
   const [hasAutoLoaded, setHasAutoLoaded] = useState(false);
   const [hasSetDefaultBranch, setHasSetDefaultBranch] = useState(false);
 
-  /* Update selectedBranch to defaultBranch if it's still 'main' and we have a better default */
+  /* Update selectedBranch to defaultBranch if it's still in 'main' and we have a better default */
   useEffect(() => {
     if (
       !hasSetDefaultBranch &&
@@ -70,6 +77,7 @@ export function ConfigPanel() {
   };
 
   const handleLoad = () => {
+    closeMobileNav();
     loadChangelogs(selectedModules, selectedBranch, false).catch(console.log);
   };
 
@@ -122,6 +130,40 @@ export function ConfigPanel() {
             <SelectItem value="all">All versions</SelectItem>
           </SelectContent>
         </Select>
+      </div>
+
+      <div>
+        <label className="text-xs font-semibold uppercase text-muted-foreground mb-2 block">
+          Date Filter
+        </label>
+        <Select value={dateFilter} onValueChange={setDateFilter}>
+          <SelectTrigger>
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All time</SelectItem>
+            <SelectItem value="last-7-days">Last 7 days</SelectItem>
+            <SelectItem value="last-30-days">Last 30 days</SelectItem>
+            <SelectItem value="last-90-days">Last 90 days</SelectItem>
+            <SelectItem value="after-last-visit">After last visit ⭐</SelectItem>
+          </SelectContent>
+        </Select>
+        {dateFilter !== 'all' && versionLimit !== 'all' && versionLimit < 5 && (
+          <p className="text-xs text-amber-600 dark:text-amber-400 mt-1.5 flex items-start gap-1">
+            <span className="mt-0.5">⚠️</span>
+            <span>
+              Version limit may hide filtered versions. Consider increasing limit or set to &quot;All
+              versions&quot;.
+            </span>
+          </p>
+        )}
+      </div>
+
+      <div className="flex items-center gap-2 pt-2">
+        <Checkbox id="hide-unchanged" checked={hideUnchanged} onCheckedChange={setHideUnchanged} />
+        <label htmlFor="hide-unchanged" className="text-sm cursor-pointer select-none">
+          Hide unchanged modules
+        </label>
       </div>
 
       <Button

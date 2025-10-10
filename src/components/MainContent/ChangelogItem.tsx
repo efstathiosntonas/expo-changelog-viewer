@@ -1,10 +1,18 @@
-import { useState, forwardRef, useImperativeHandle, useEffect } from 'react';
+import { useState, forwardRef, useImperativeHandle, useEffect, useMemo } from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import rehypeRaw from 'rehype-raw';
 import { ChevronRight } from 'lucide-react';
 import { type ChangelogResult } from '@/hooks/useChangelogCache';
-import { parseChangelog, filterVersions, combineVersions } from '@/utils/changelogFilter';
+import {
+  parseChangelog,
+  filterVersions,
+  filterVersionsByDate,
+  combineVersions,
+  hasNoUserFacingChanges,
+} from '@/utils/changelogFilter';
+import { getDateFilterCutoff } from '@/utils/dateFilter';
+import { useChangelogContext } from '@/hooks/useChangelogContext';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Badge } from '@/components/ui/badge';
@@ -24,7 +32,14 @@ export interface ChangelogItemRef {
 
 export const ChangelogItem = forwardRef<ChangelogItemRef, ChangelogItemProps>(
   ({ changelog, versionLimit, isViewed, onToggleViewed, defaultExpanded = false }, ref) => {
-    const [isExpanded, setIsExpanded] = useState(defaultExpanded);
+    const { dateFilter, moduleLastViewed, setModuleLastViewed } = useChangelogContext();
+
+    /* Check if the changelog has no user-facing changes */
+    const hasNoChanges = useMemo(() => {
+      return hasNoUserFacingChanges(changelog.content);
+    }, [changelog.content]);
+
+    const [isExpanded, setIsExpanded] = useState(hasNoChanges ? false : defaultExpanded);
     const [cacheLabel, setCacheLabel] = useState('');
 
     useImperativeHandle(ref, () => ({
@@ -32,8 +47,24 @@ export const ChangelogItem = forwardRef<ChangelogItemRef, ChangelogItemProps>(
     }));
 
     const versions = parseChangelog(changelog.content);
-    const filteredVersions = filterVersions(versions, versionLimit);
+
+    /* Apply date filtering */
+    const { filteredByDate, cutoffDate } = useMemo(() => {
+      const lastVisit = moduleLastViewed[changelog.module];
+      const cutoff = getDateFilterCutoff(dateFilter, lastVisit);
+      const filtered = filterVersionsByDate(versions, cutoff);
+      return { filteredByDate: filtered, cutoffDate: cutoff };
+    }, [versions, dateFilter, moduleLastViewed, changelog.module]);
+
+    /* Apply version limit filtering */
+    const filteredVersions = filterVersions(filteredByDate, versionLimit);
     const displayContent = combineVersions(filteredVersions);
+
+    /* Calculate how many new versions since last visit */
+    const newVersionCount = useMemo(() => {
+      if (dateFilter !== 'after-last-visit' || !cutoffDate) return 0;
+      return filteredByDate.length;
+    }, [dateFilter, cutoffDate, filteredByDate.length]);
 
     /* Update cache age label every minute */
     useEffect(() => {
@@ -51,6 +82,16 @@ export const ChangelogItem = forwardRef<ChangelogItemRef, ChangelogItemProps>(
 
       return () => clearInterval(interval);
     }, [changelog.fetchedAt]);
+
+    /* Update the last viewed timestamp when marking as viewed */
+    useEffect(() => {
+      if (isViewed) {
+        setModuleLastViewed((prev) => ({
+          ...prev,
+          [changelog.module]: Date.now(),
+        }));
+      }
+    }, [isViewed, changelog.module, setModuleLastViewed]);
 
     return (
       <Collapsible
@@ -86,9 +127,28 @@ export const ChangelogItem = forwardRef<ChangelogItemRef, ChangelogItemProps>(
                     Fresh ✓
                   </Badge>
                 )}
+                {dateFilter === 'after-last-visit' && newVersionCount > 0 && (
+                  <Badge variant="default" className="text-xs flex-shrink-0">
+                    {newVersionCount} new
+                  </Badge>
+                )}
+                {hasNoChanges && (
+                  <Badge variant="outline" className="text-xs flex-shrink-0">
+                    No user-facing changes
+                  </Badge>
+                )}
+                {!hasNoChanges &&
+                  dateFilter !== 'all' &&
+                  cutoffDate &&
+                  filteredByDate.length === 0 && (
+                    <Badge variant="outline" className="text-xs flex-shrink-0">
+                      No changes in filter
+                    </Badge>
+                  )}
               </div>
               <span className="text-xs text-muted-foreground bg-muted px-2 py-0.5 rounded inline-block mt-1">
-                {versions.length} version{versions.length !== 1 ? 's' : ''} -{' '}
+                {versions.length} version{versions.length !== 1 ? 's' : ''}{' '}
+                {dateFilter !== 'all' && `(${filteredByDate.length} after filter)`} -{' '}
                 <strong>
                   viewing{' '}
                   {versionLimit === 'all'
