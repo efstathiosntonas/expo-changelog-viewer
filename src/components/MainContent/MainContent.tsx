@@ -1,0 +1,60 @@
+import { useState } from 'react';
+import { useChangelogContext } from '@/hooks/useChangelogContext';
+import { CacheStatusBanner } from './CacheStatusBanner';
+import { ActionHeader } from './ActionHeader';
+import { ErrorDisplay } from './ErrorDisplay';
+import { LoadingState } from './LoadingState';
+import { ChangelogList } from './ChangelogList';
+
+export function MainContent() {
+  const { changelogs, selectedBranch, setViewedModules } = useChangelogContext();
+  const [allExpanded, setAllExpanded] = useState(true);
+  const [collapseAllFn, setCollapseAllFn] = useState<((expanded: boolean) => void) | null>(null);
+
+  const handleCollapseAll = () => {
+    if (collapseAllFn) {
+      collapseAllFn(!allExpanded);
+    }
+    setAllExpanded(!allExpanded);
+  };
+
+  const handleToggleViewed = (moduleName: string, checked: boolean) => {
+    setViewedModules((prev: string[]) =>
+      checked ? [...prev, moduleName] : prev.filter((m: string) => m !== moduleName)
+    );
+  };
+
+  const handleExportMarkdown = () => {
+    if (changelogs.length === 0) return;
+    const markdown = changelogs.map((c) => `# ${c.module}\n\n${c.content}\n\n---\n`).join('\n');
+    const blob = new Blob([markdown], { type: 'text/markdown' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `expo-changelogs-${selectedBranch}-${new Date().toISOString().split('T')[0]}.md`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  };
+
+  return (
+    <main className="flex-1 overflow-y-auto">
+      <div className="max-w-5xl mx-auto p-4 pt-20 md:p-8 md:pt-8">
+        <CacheStatusBanner />
+        <ActionHeader
+          onCollapseAll={handleCollapseAll}
+          onExport={handleExportMarkdown}
+          allExpanded={allExpanded}
+        />
+        <ErrorDisplay />
+        <LoadingState>
+          <ChangelogList
+            onToggleViewed={handleToggleViewed}
+            onCollapseAllChange={(fn) => setCollapseAllFn(() => fn)}
+          />
+        </LoadingState>
+      </div>
+    </main>
+  );
+}

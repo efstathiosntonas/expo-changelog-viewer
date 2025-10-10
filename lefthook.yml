@@ -1,0 +1,19 @@
+no_tty: true
+pre-commit:
+  parallel: true
+  commands:
+    prettier:
+      glob: "*.{js,jsx,ts,tsx,json,css,md,html}"
+      run: ./node_modules/.bin/prettier --write {staged_files}
+    eslint:
+      interactive: true
+      glob: "*.{js,ts,jsx,tsx}"
+      run: ./node_modules/.bin/eslint {staged_files} --concurrency=auto
+    types:
+      glob: "*.{ts,tsx}"
+      run: tsc --noEmit
+
+pre-push:
+  commands:
+    build:
+      run: yarn build

@@ -1,0 +1,17 @@
+{
+  "cacheExpiration": 10,
+  "concurrency": 12,
+  "deep": false,
+  "errorLevel": 1,
+  "format": ["group", "repo"],
+  "install": "prompt",
+  "interactive": true,
+  "loglevel": "info",
+  "minimal": false,
+  "packageManager": "yarn",
+  "registryType": "npm",
+  "retry": 3,
+  "target": "latest",
+  "upgrade": true,
+  "reject": []
+}

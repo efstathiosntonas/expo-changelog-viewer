@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en" class="dark">
+  <head>
+    <style>
+      /* CRITICAL: Prevent white flash - defaults to dark, must be FIRST */
+      html,
+      body,
+      #root {
+        background-color: #0a1628 !important;
+        color: #f8fafc !important;
+      }
+      html:not(.dark),
+      html:not(.dark) body,
+      html:not(.dark) #root {
+        background-color: #ffffff !important;
+        color: #0f172a !important;
+      }
+    </style>
+    <script>
+      (function () {
+        try {
+          const theme = localStorage.getItem('expo-theme');
+          if (theme === 'light') {
+            document.documentElement.classList.remove('dark');
+          } else if (!theme || theme === 'auto') {
+            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            if (!prefersDark) {
+              document.documentElement.classList.remove('dark');
+            }
+          }
+        } catch (e) {}
+      })();
+    </script>
+    <meta charset="UTF-8" />
+    <meta name="color-scheme" content="dark light" />
+    <meta name="theme-color" content="#0a1628" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Expo Changelog Viewer</title>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
