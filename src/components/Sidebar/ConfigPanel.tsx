@@ -1,6 +1,6 @@
 import { ChangeEvent, useEffect, useRef, useState } from 'react';
 
-import { HelpCircle, Upload } from 'lucide-react';
+import { Upload } from 'lucide-react';
 
 import { useMobileNav } from '@/contexts/MobileNavContext';
 
@@ -9,6 +9,7 @@ import { useSDKBranches } from '@/hooks/useSDKBranches';
 
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
+import { HelpIcon } from '@/components/ui/help-icon';
 import {
   Select,
   SelectContent,
@@ -16,7 +17,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { TooltipProvider } from '@/components/ui/tooltip';
 
 import { parsePackageJson, readFileAsText } from '@/utils/packageJsonParser';
 
@@ -134,23 +135,13 @@ export function ConfigPanel() {
             <label className="text-xs font-semibold uppercase text-muted-foreground">
               SDK Version
             </label>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <button
-                  className="text-muted-foreground hover:text-foreground transition-colors"
-                  type="button"
-                >
-                  <HelpCircle className="h-3.5 w-3.5" />
-                </button>
-              </TooltipTrigger>
-              <TooltipContent className="max-w-xs">
-                <p className="font-semibold mb-1">Choose Expo SDK version</p>
-                <p className="text-xs">
-                  Select which SDK version&apos;s changelogs to fetch. Each SDK has its own
-                  changelog branch with version-specific updates.
-                </p>
-              </TooltipContent>
-            </Tooltip>
+            <HelpIcon>
+              <p className="font-semibold mb-1">Choose Expo SDK version</p>
+              <p className="text-xs">
+                Select which SDK version&apos;s changelogs to fetch. Each SDK has its own
+                changelog branch with version-specific updates.
+              </p>
+            </HelpIcon>
           </div>
           <Select
             disabled={loadingVersions}
@@ -175,24 +166,14 @@ export function ConfigPanel() {
             <label className="text-xs font-semibold uppercase text-muted-foreground">
               Version Limit
             </label>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <button
-                  className="text-muted-foreground hover:text-foreground transition-colors"
-                  type="button"
-                >
-                  <HelpCircle className="h-3.5 w-3.5" />
-                </button>
-              </TooltipTrigger>
-              <TooltipContent className="max-w-xs">
-                <p className="font-semibold mb-1">Limits how many versions to display</p>
-                <p className="text-xs">
-                  Works with Date Filter: First filters by date, then limits the number of versions
-                  shown. If using date filters, set this to &quot;All versions&quot; to see all
-                  matching results.
-                </p>
-              </TooltipContent>
-            </Tooltip>
+            <HelpIcon>
+              <p className="font-semibold mb-1">Limits how many versions to display</p>
+              <p className="text-xs">
+                Works with Date Filter: First filters by date, then limits the number of versions
+                shown. If using date filters, set this to &quot;All versions&quot; to see all
+                matching results.
+              </p>
+            </HelpIcon>
           </div>
           <Select
             onValueChange={(val) => setVersionLimit(val === 'all' ? 'all' : parseInt(val))}
@@ -222,26 +203,16 @@ export function ConfigPanel() {
             <label className="text-xs font-semibold uppercase text-muted-foreground">
               Date Filter
             </label>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <button
-                  className="text-muted-foreground hover:text-foreground transition-colors"
-                  type="button"
-                >
-                  <HelpCircle className="h-3.5 w-3.5" />
-                </button>
-              </TooltipTrigger>
-              <TooltipContent className="max-w-xs">
-                <p className="font-semibold mb-1">Filter versions by release date</p>
-                <p className="text-xs mb-2">
-                  &quot;After last visit&quot; shows only versions released since you last marked
-                  the module as viewed.
-                </p>
-                <p className="text-xs text-muted-foreground">
-                  Works with Version Limit and Hide unchanged filters.
-                </p>
-              </TooltipContent>
-            </Tooltip>
+            <HelpIcon>
+              <p className="font-semibold mb-1">Filter versions by release date</p>
+              <p className="text-xs mb-2">
+                &quot;After last visit&quot; shows only versions released since you last marked
+                the module as viewed.
+              </p>
+              <p className="text-xs text-muted-foreground">
+                Works with Version Limit and Hide unchanged filters.
+              </p>
+            </HelpIcon>
           </div>
           <Select onValueChange={setDateFilter} value={dateFilter}>
             <SelectTrigger>
@@ -275,23 +246,13 @@ export function ConfigPanel() {
           <label className="text-sm cursor-pointer select-none" htmlFor="hide-unchanged">
             Hide unchanged versions
           </label>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <button
-                className="text-muted-foreground hover:text-foreground transition-colors"
-                type="button"
-              >
-                <HelpCircle className="h-3.5 w-3.5" />
-              </button>
-            </TooltipTrigger>
-            <TooltipContent className="max-w-xs">
-              <p className="font-semibold mb-1">Filters out empty changelog versions</p>
-              <p className="text-xs">
-                Hides versions with &quot;no user-facing changes&quot; text. Modules with no changes
-                are moved to the bottom of the list.
-              </p>
-            </TooltipContent>
-          </Tooltip>
+          <HelpIcon>
+            <p className="font-semibold mb-1">Filters out empty changelog versions</p>
+            <p className="text-xs">
+              Hides versions with &quot;no user-facing changes&quot; text. Modules with no changes
+              are moved to the bottom of the list.
+            </p>
+          </HelpIcon>
         </div>
       </div>
 
@@ -317,23 +278,13 @@ export function ConfigPanel() {
                 <Upload className="h-4 w-4 mr-2" />
                 Import from package.json
               </Button>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <button
-                    className="text-muted-foreground hover:text-foreground transition-colors"
-                    type="button"
-                  >
-                    <HelpCircle className="h-3.5 w-3.5" />
-                  </button>
-                </TooltipTrigger>
-                <TooltipContent className="max-w-xs">
-                  <p className="font-semibold mb-1">Quick import from your project</p>
-                  <p className="text-xs">
-                    Upload your package.json to automatically select all Expo modules from your
-                    dependencies. All processing happens locally in your browser.
-                  </p>
-                </TooltipContent>
-              </Tooltip>
+              <HelpIcon>
+                <p className="font-semibold mb-1">Quick import from your project</p>
+                <p className="text-xs">
+                  Upload your package.json to automatically select all Expo modules from your
+                  dependencies. All processing happens locally in your browser.
+                </p>
+              </HelpIcon>
             </div>
           </div>
           <p className="text-xs text-muted-foreground text-center">
