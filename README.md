@@ -23,7 +23,7 @@ A modern web application to view and compare changelogs for Expo SDK modules. Bu
 
 ## Live Demo
 
-Visit: [https://efstathiosntonas.github.io/expo-changelog-viewer/](https://YOUR-USERNAME.github.io/expo-changelog-viewer/)
+Visit: [https://efstathiosntonas.github.io/expo-changelog-viewer/](https://efstathiosntonas.github.io/expo-changelog-viewer/)
 
 ## Local Development
 
