@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef, ChangeEvent } from 'react';
-import { Upload } from 'lucide-react';
+import { Upload, HelpCircle } from 'lucide-react';
 import { useSDKBranches } from '@/hooks/useSDKBranches';
 import { useChangelogContext } from '@/hooks/useChangelogContext';
 import { useMobileNav } from '@/contexts/MobileNavContext';
@@ -12,6 +12,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@/components/ui/tooltip';
 import { parsePackageJson, readFileAsText } from '@/utils/packageJsonParser';
 
 export function ConfigPanel() {
@@ -121,12 +127,24 @@ export function ConfigPanel() {
   };
 
   return (
-    <>
+    <TooltipProvider delayDuration={300}>
       <div className="px-4 py-5 space-y-4 border-b">
         <div>
-          <label className="text-xs font-semibold uppercase text-muted-foreground mb-2 block">
-            SDK Version
-          </label>
+          <div className="flex items-center gap-1.5 mb-2">
+            <label className="text-xs font-semibold uppercase text-muted-foreground">
+              SDK Version
+            </label>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <button type="button" className="text-muted-foreground hover:text-foreground transition-colors">
+                  <HelpCircle className="h-3.5 w-3.5" />
+                </button>
+              </TooltipTrigger>
+              <TooltipContent className="max-w-xs">
+                <p>Select which Expo SDK version&apos;s changelogs to fetch. Each SDK has its own changelog branch.</p>
+              </TooltipContent>
+            </Tooltip>
+          </div>
           <Select
             value={selectedBranch}
             onValueChange={handleBranchChange}
@@ -146,9 +164,22 @@ export function ConfigPanel() {
         </div>
 
         <div>
-          <label className="text-xs font-semibold uppercase text-muted-foreground mb-2 block">
-            Version Limit
-          </label>
+          <div className="flex items-center gap-1.5 mb-2">
+            <label className="text-xs font-semibold uppercase text-muted-foreground">
+              Version Limit
+            </label>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <button type="button" className="text-muted-foreground hover:text-foreground transition-colors">
+                  <HelpCircle className="h-3.5 w-3.5" />
+                </button>
+              </TooltipTrigger>
+              <TooltipContent className="max-w-xs">
+                <p className="font-semibold mb-1">Limits how many versions to display</p>
+                <p className="text-xs">Works with Date Filter: First filters by date, then limits the number of versions shown. If using date filters, set this to &quot;All versions&quot; to see all matching results.</p>
+              </TooltipContent>
+            </Tooltip>
+          </div>
           <Select
             value={versionLimit.toString()}
             onValueChange={(val) => setVersionLimit(val === 'all' ? 'all' : parseInt(val))}
@@ -173,9 +204,23 @@ export function ConfigPanel() {
         </div>
 
         <div>
-          <label className="text-xs font-semibold uppercase text-muted-foreground mb-2 block">
-            Date Filter
-          </label>
+          <div className="flex items-center gap-1.5 mb-2">
+            <label className="text-xs font-semibold uppercase text-muted-foreground">
+              Date Filter
+            </label>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <button type="button" className="text-muted-foreground hover:text-foreground transition-colors">
+                  <HelpCircle className="h-3.5 w-3.5" />
+                </button>
+              </TooltipTrigger>
+              <TooltipContent className="max-w-xs">
+                <p className="font-semibold mb-1">Filter versions by release date</p>
+                <p className="text-xs mb-2">&quot;After last visit&quot; shows only versions released since you last marked the module as viewed.</p>
+                <p className="text-xs text-muted-foreground">Works with Version Limit and Hide unchanged filters.</p>
+              </TooltipContent>
+            </Tooltip>
+          </div>
           <Select value={dateFilter} onValueChange={setDateFilter}>
             <SelectTrigger>
               <SelectValue />
@@ -208,6 +253,17 @@ export function ConfigPanel() {
           <label htmlFor="hide-unchanged" className="text-sm cursor-pointer select-none">
             Hide unchanged versions
           </label>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <button type="button" className="text-muted-foreground hover:text-foreground transition-colors">
+                <HelpCircle className="h-3.5 w-3.5" />
+              </button>
+            </TooltipTrigger>
+            <TooltipContent className="max-w-xs">
+              <p className="font-semibold mb-1">Filters out empty changelog versions</p>
+              <p className="text-xs">Hides versions with &quot;no user-facing changes&quot; text. Modules with no changes are moved to the bottom of the list.</p>
+            </TooltipContent>
+          </Tooltip>
         </div>
       </div>
 
@@ -224,14 +280,27 @@ export function ConfigPanel() {
               className="hidden"
               aria-label="Upload package.json"
             />
-            <Button
-              variant="outline"
-              onClick={() => fileInputRef.current?.click()}
-              className="w-full border-purple-500 text-purple-600 hover:bg-purple-50 dark:border-purple-400 dark:text-purple-400 dark:hover:bg-purple-950"
-            >
-              <Upload className="h-4 w-4 mr-2" />
-              Import from package.json
-            </Button>
+            <div className="flex items-center gap-2">
+              <Button
+                variant="outline"
+                onClick={() => fileInputRef.current?.click()}
+                className="flex-1 border-purple-500 text-purple-600 hover:bg-purple-50 dark:border-purple-400 dark:text-purple-400 dark:hover:bg-purple-950"
+              >
+                <Upload className="h-4 w-4 mr-2" />
+                Import from package.json
+              </Button>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <button type="button" className="text-muted-foreground hover:text-foreground transition-colors">
+                    <HelpCircle className="h-3.5 w-3.5" />
+                  </button>
+                </TooltipTrigger>
+                <TooltipContent className="max-w-xs">
+                  <p className="font-semibold mb-1">Quick import from your project</p>
+                  <p className="text-xs">Upload your package.json to automatically select all Expo modules from your dependencies. All processing happens locally in your browser.</p>
+                </TooltipContent>
+              </Tooltip>
+            </div>
           </div>
           <p className="text-xs text-muted-foreground text-center">
             🔒 100% private - processed locally in your browser
@@ -265,6 +334,6 @@ export function ConfigPanel() {
             : `Load ${selectedModules.length} Module${selectedModules.length !== 1 ? 's' : ''}`}
         </Button>
       </div>
-    </>
+    </TooltipProvider>
   );
 }
