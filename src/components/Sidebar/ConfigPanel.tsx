@@ -152,8 +152,8 @@ export function ConfigPanel() {
           <p className="text-xs text-amber-600 dark:text-amber-400 mt-1.5 flex items-start gap-1">
             <span className="mt-0.5">⚠️</span>
             <span>
-              Version limit may hide filtered versions. Consider increasing limit or set to &quot;All
-              versions&quot;.
+              Version limit may hide filtered versions. Consider increasing limit or set to
+              &quot;All versions&quot;.
             </span>
           </p>
         )}
