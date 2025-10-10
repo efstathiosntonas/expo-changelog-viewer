@@ -51,10 +51,10 @@ export function ModuleList({
             if (catModules.length === 0) return null;
             return (
               <div key={category}>
-                <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wide px-2 py-2">
+                <div className="text-[10px] font-medium text-gray-400 dark:text-gray-600 uppercase tracking-wider px-2 py-1.5 bg-gray-100 dark:bg-gray-900">
                   {category}
                 </div>
-                <div className="space-y-2">{catModules.map(renderModuleItem)}</div>
+                <div className="space-y-2 pt-1">{catModules.map(renderModuleItem)}</div>
               </div>
             );
           })

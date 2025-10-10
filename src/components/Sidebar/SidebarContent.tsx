@@ -4,8 +4,10 @@ import { useChangelogContext } from '@/hooks/useChangelogContext';
 import { SidebarHeader } from './SidebarHeader';
 import { ModuleSearch } from './ModuleSearch';
 import { ConfigPanel } from './ConfigPanel';
-import { CategoryFilter } from './CategoryFilter';
+import { CategorySelect } from './CategorySelect';
+import { ModuleSelectionActions } from './ModuleSelectionActions';
 import { ModuleList } from './ModuleList';
+import { TooltipProvider } from '@/components/ui/tooltip';
 
 interface SidebarContentProps {
   isMobile?: boolean;
@@ -46,48 +48,52 @@ export function SidebarContent({ isMobile = false }: SidebarContentProps) {
    */
   if (isMobile) {
     return (
-      <>
+      <TooltipProvider delayDuration={300}>
         <SidebarHeader />
         <ModuleSearch value={searchTerm} onChange={setSearchTerm} />
         <ConfigPanel />
-        <CategoryFilter
+        <CategorySelect
           selectedCategory={selectedCategory}
           onCategoryChange={setSelectedCategory}
-          onSelectAll={handleSelectAll}
-          onClearAll={handleClearAll}
         />
+        <ModuleSelectionActions onSelectAll={handleSelectAll} onClearAll={handleClearAll} />
         <ModuleList
           selectedModules={selectedModules}
           onToggleModule={handleToggleModule}
           searchTerm={searchTerm}
           selectedCategory={selectedCategory}
         />
-      </>
+      </TooltipProvider>
     );
   }
 
-  /* Desktop version with a fixed header and scrollable module list */
+  /* Desktop version: Side-by-side layout (filters | modules) */
   return (
-    <div className="flex flex-col h-full">
-      <div className="flex-shrink-0">
-        <SidebarHeader />
-        <ModuleSearch value={searchTerm} onChange={setSearchTerm} />
-        <ConfigPanel />
-        <CategoryFilter
-          selectedCategory={selectedCategory}
-          onCategoryChange={setSelectedCategory}
-          onSelectAll={handleSelectAll}
-          onClearAll={handleClearAll}
-        />
+    <TooltipProvider delayDuration={300}>
+      <div className="flex h-full">
+        <div className="w-1/2 border-r flex flex-col">
+          <SidebarHeader />
+          <div className="flex-1 overflow-y-auto">
+            <ModuleSearch value={searchTerm} onChange={setSearchTerm} />
+            <ConfigPanel />
+            <CategorySelect
+              selectedCategory={selectedCategory}
+              onCategoryChange={setSelectedCategory}
+            />
+          </div>
+        </div>
+        <div className="w-1/2 flex flex-col">
+          <ModuleSelectionActions onSelectAll={handleSelectAll} onClearAll={handleClearAll} />
+          <div className="flex-1 overflow-y-auto">
+            <ModuleList
+              selectedModules={selectedModules}
+              onToggleModule={handleToggleModule}
+              searchTerm={searchTerm}
+              selectedCategory={selectedCategory}
+            />
+          </div>
+        </div>
       </div>
-      <div className="flex-1 overflow-y-auto min-h-0">
-        <ModuleList
-          selectedModules={selectedModules}
-          onToggleModule={handleToggleModule}
-          searchTerm={searchTerm}
-          selectedCategory={selectedCategory}
-        />
-      </div>
-    </div>
+    </TooltipProvider>
   );
 }
