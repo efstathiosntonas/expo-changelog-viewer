@@ -93,6 +93,7 @@ export const EXPO_MODULES: ExpoModule[] = [
   { name: 'expo-eas-client', category: 'Development & Core' },
   { name: 'expo-modules-autolinking', category: 'Development & Core' },
   { name: 'expo-modules-core', category: 'Development & Core' },
+  { name: 'expo', category: 'Development & Core' },
 ];
 
 export const CATEGORIES = Array.from(new Set(EXPO_MODULES.map((m) => m.category))).sort();
