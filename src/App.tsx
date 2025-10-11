@@ -1,3 +1,5 @@
+import { Toaster } from 'sonner';
+
 import { ChangelogProvider } from '@/contexts/ChangelogContext';
 import { MobileNavProvider } from '@/contexts/MobileNavContext';
 
@@ -14,6 +16,7 @@ function App() {
           <Sidebar />
           <MainContent />
         </div>
+        <Toaster position="top-right" richColors />
       </MobileNavProvider>
     </ChangelogProvider>
   );

@@ -4,6 +4,7 @@ import { GitBranch, Target } from 'lucide-react';
 import { StaticTreeDataProvider, Tree, UncontrolledTreeEnvironment } from 'react-complex-tree';
 import ReactMarkdown from 'react-markdown';
 import rehypeRaw from 'rehype-raw';
+import rehypeSanitize from 'rehype-sanitize';
 import remarkGfm from 'remark-gfm';
 
 import 'react-complex-tree/lib/style-modern.css';
@@ -117,7 +118,7 @@ export function VersionWithDependencies({ version }: VersionWithDependenciesProp
         components={{
           a: ({ ...props }) => <a {...props} rel="noopener noreferrer" target="_blank" />,
         }}
-        rehypePlugins={[rehypeRaw]}
+        rehypePlugins={[rehypeRaw, rehypeSanitize]}
         remarkPlugins={[remarkGfm]}
       >
         {version.content}
@@ -242,7 +243,7 @@ export function VersionWithDependencies({ version }: VersionWithDependenciesProp
                                 <div className="font-semibold mb-1 text-sm">{children}</div>
                               ),
                             }}
-                            rehypePlugins={[rehypeRaw]}
+                            rehypePlugins={[rehypeRaw, rehypeSanitize]}
                             remarkPlugins={[remarkGfm]}
                           >
                             {item.data.changelog}

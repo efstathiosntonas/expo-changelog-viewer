@@ -1,4 +1,5 @@
 import { findDependencyChanges } from './npmDependencyComparer';
+import { fetchWithRetry } from './retryWithBackoff';
 
 export interface DependencyTreeNode {
   changelog?: string;
@@ -12,10 +13,44 @@ export interface DependencyTreeNode {
 }
 
 const MAX_DEPTH = 10; /* Prevent infinite recursion */
-const packageCache = new Map<
-  string,
-  string | null
->(); /* Cache changelog content, null = no changelog exists */
+
+/**
+ * Cache manager for changelog content
+ * Encapsulates cache logic and provides better lifecycle control
+ */
+class ChangelogCacheManager {
+  private cache = new Map<string, string | null>();
+  private maxSize = 500; /* Limit cache size to prevent unbounded growth */
+
+  has(key: string): boolean {
+    return this.cache.has(key);
+  }
+
+  get(key: string): string | null | undefined {
+    return this.cache.get(key);
+  }
+
+  set(key: string, value: string | null): void {
+    /* Implement simple LRU: if cache is full, remove oldest entries */
+    if (this.cache.size >= this.maxSize) {
+      const firstKey = this.cache.keys().next().value;
+      if (firstKey) {
+        this.cache.delete(firstKey);
+      }
+    }
+    this.cache.set(key, value);
+  }
+
+  clear(): void {
+    this.cache.clear();
+  }
+
+  size(): number {
+    return this.cache.size;
+  }
+}
+
+const packageCache = new ChangelogCacheManager();
 
 /* Packages WITHOUT CHANGELOGs that we should skip */
 const PACKAGES_WITHOUT_CHANGELOG_EXPLICIT = new Set([
@@ -200,7 +235,20 @@ async function fetchChangelog(packageName: string, branch: string): Promise<stri
   try {
     const packagePath = getPackagePath(packageName);
     const url = `https://raw.githubusercontent.com/expo/expo/${branch}/packages/${packagePath}/CHANGELOG.md`;
-    const response = await fetch(url);
+
+    /* Use fetch with retry for better reliability */
+    const response = await fetchWithRetry(url, undefined, {
+      maxRetries: 2,
+      initialDelay: 500,
+      shouldRetry: (error) => {
+        /* Don't retry 404s - they're expected for packages without changelogs */
+        if (error instanceof Response && error.status === 404) {
+          return false;
+        }
+        /* Retry network errors and 5xx errors */
+        return true;
+      },
+    });
 
     if (!response.ok) {
       /* Cache the 404 so we don't retry this package */
@@ -380,7 +428,17 @@ export async function buildAllDependencyTrees(
     return [];
   }
 
-  const treePromises = changes.map((change) =>
+  /* Deduplicate changes by package name (keep first occurrence) */
+  const seen = new Set<string>();
+  const uniqueChanges = changes.filter((change) => {
+    if (seen.has(change.name)) {
+      return false;
+    }
+    seen.add(change.name);
+    return true;
+  });
+
+  const treePromises = uniqueChanges.map((change) =>
     buildDependencyTree(
       change.name,
       change.oldVersion,

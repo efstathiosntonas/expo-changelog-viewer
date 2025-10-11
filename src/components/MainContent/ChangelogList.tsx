@@ -33,7 +33,17 @@ export function ChangelogList({ onToggleViewed, onCollapseAllChange }: Changelog
 
   /* Filter and sort changelogs */
   const sortedChangelogs = useMemo(() => {
-    const filtered = changelogs;
+    /* Deduplicate changelogs by module name (keep first occurrence) */
+    const seen = new Set<string>();
+    const deduplicated = changelogs.filter((c) => {
+      if (seen.has(c.module)) {
+        return false;
+      }
+      seen.add(c.module);
+      return true;
+    });
+
+    const filtered = deduplicated;
 
     /* When hideUnchanged is enabled, separate modules with/without changes */
     if (hideUnchanged) {

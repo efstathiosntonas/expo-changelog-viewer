@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react';
 
+import { handleStorageError } from '@/utils/errorHandler';
+
 export function useLocalStorage<T>(
   key: string,
   initialValue: T
@@ -30,7 +32,15 @@ export function useLocalStorage<T>(
       /* Save state */
       setStoredValue(valueToStore);
     } catch (error) {
-      console.warn(`Error setting localStorage key "${key}":`, error);
+      /* Handle storage quota exceeded errors specifically */
+      if (
+        error instanceof DOMException &&
+        (error.name === 'QuotaExceededError' || error.name === 'NS_ERROR_DOM_QUOTA_REACHED')
+      ) {
+        handleStorageError(error, 'localStorage');
+      } else {
+        console.warn(`Error setting localStorage key "${key}":`, error);
+      }
     }
   };
 

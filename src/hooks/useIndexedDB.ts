@@ -1,5 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 
+import { handleStorageError } from '@/utils/errorHandler';
+
 const DB_NAME = 'expo-changelog-db';
 const DB_VERSION = 5; /* Bump to force re-hydration if cache structure changes */
 const CHANGELOG_STORE = 'changelogs';
@@ -186,11 +188,20 @@ export function useIndexedDB() {
           transaction.oncomplete = () => resolve();
           transaction.onerror = () => {
             console.error('IndexedDB set error:', transaction.error);
+            /* Handle quota exceeded errors */
+            if (transaction.error && transaction.error.name === 'QuotaExceededError') {
+              handleStorageError(transaction.error, 'IndexedDB');
+            }
             resolve();
           };
         });
       } catch (error) {
-        console.error('IndexedDB set failed:', error);
+        /* Handle quota exceeded errors */
+        if (error instanceof DOMException && error.name === 'QuotaExceededError') {
+          handleStorageError(error, 'IndexedDB');
+        } else {
+          console.error('IndexedDB set failed:', error);
+        }
       }
     },
     [dbReady]
@@ -247,11 +258,20 @@ export function useIndexedDB() {
           transaction.oncomplete = () => resolve();
           transaction.onerror = () => {
             console.error('IndexedDB npm set error:', transaction.error);
+            /* Handle quota exceeded errors */
+            if (transaction.error && transaction.error.name === 'QuotaExceededError') {
+              handleStorageError(transaction.error, 'IndexedDB');
+            }
             resolve();
           };
         });
       } catch (error) {
-        console.error('IndexedDB npm set failed:', error);
+        /* Handle quota exceeded errors */
+        if (error instanceof DOMException && error.name === 'QuotaExceededError') {
+          handleStorageError(error, 'IndexedDB');
+        } else {
+          console.error('IndexedDB npm set failed:', error);
+        }
       }
     },
     [dbReady]
@@ -294,7 +314,19 @@ export function useIndexedDB() {
           if (validated.length !== results.length) {
             console.warn('Some cache entries were invalid and skipped');
           }
-          resolve(validated);
+
+          /* Deduplicate by key (defensive safeguard) */
+          const seen = new Set<string>();
+          const deduplicated = validated.filter((entry) => {
+            if (seen.has(entry.key)) {
+              console.warn('Duplicate cache entry found:', entry.key);
+              return false;
+            }
+            seen.add(entry.key);
+            return true;
+          });
+
+          resolve(deduplicated);
         };
         request.onerror = () => {
           console.error('IndexedDB getAll error:', request.error);

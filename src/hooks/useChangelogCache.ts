@@ -2,6 +2,7 @@ import { useCallback } from 'react';
 
 import { enrichChangelogWithDependencies } from '@/utils/changelogEnricher';
 import { parseChangelog } from '@/utils/changelogFilter';
+import { fetchWithRetry } from '@/utils/retryWithBackoff';
 
 import { useIndexedDB } from './useIndexedDB';
 
@@ -78,11 +79,22 @@ export function useChangelogCache() {
         }
       }
 
-      /* Fetch from GitHub */
+      /* Fetch from GitHub with retry logic */
       const url = `${GITHUB_RAW_URL}/${branch}/packages/${module}/CHANGELOG.md`;
 
       try {
-        const response = await fetch(url);
+        const response = await fetchWithRetry(url, undefined, {
+          maxRetries: 2,
+          initialDelay: 500,
+          shouldRetry: (error) => {
+            /* Don't retry 404s - changelog doesn't exist */
+            if (error instanceof Response && error.status === 404) {
+              return false;
+            }
+            /* Retry network errors and 5xx server errors */
+            return true;
+          },
+        });
 
         if (!response.ok) {
           throw new Error(`Failed to fetch: ${response.status} ${response.statusText}`);
@@ -91,17 +103,22 @@ export function useChangelogCache() {
         const content = await response.text();
         const fetchedAt = Date.now();
 
-        /* Store in cache */
+        /* Store in cache (but don't fail if storage is full) */
         if (dbReady) {
-          const ttl = getTTL(branch);
-          await set({
-            key,
-            module,
-            branch,
-            content,
-            fetchedAt,
-            ttl,
-          });
+          try {
+            const ttl = getTTL(branch);
+            await set({
+              key,
+              module,
+              branch,
+              content,
+              fetchedAt,
+              ttl,
+            });
+          } catch (error) {
+            /* Storage errors are handled in useIndexedDB, just log here */
+            console.warn(`Failed to cache ${module}:`, error);
+          }
         }
 
         return {
@@ -132,26 +149,40 @@ export function useChangelogCache() {
     ): Promise<ChangelogResult[]> => {
       const results: ChangelogResult[] = [];
       let cached = 0;
+      const BATCH_SIZE = 10; /* Fetch 10 modules concurrently */
+      const BATCH_DELAY = 100; /* 100ms delay between batches */
 
-      /* Fetch all changelogs first */
-      for (let i = 0; i < modules.length; i++) {
-        const currentModule = modules[i];
+      /* Process modules in batches for speed while showing progress */
+      for (let batchStart = 0; batchStart < modules.length; batchStart += BATCH_SIZE) {
+        const batchEnd = Math.min(batchStart + BATCH_SIZE, modules.length);
+        const batch = modules.slice(batchStart, batchEnd);
 
-        /* Report progress before fetching */
+        /* Report progress before batch */
         if (onProgress) {
-          onProgress(i, modules.length, cached, currentModule);
+          onProgress(batchStart, modules.length, cached, batch[0]);
         }
 
-        const result = await fetchChangelog(currentModule, branch, forceRefresh);
-        results.push(result);
+        /* Fetch batch in parallel */
+        const batchResults = await Promise.all(
+          batch.map((module) => fetchChangelog(module, branch, forceRefresh))
+        );
 
-        if (result.cached) {
-          cached++;
+        /* Collect results and update cache count */
+        batchResults.forEach((result) => {
+          results.push(result);
+          if (result.cached) {
+            cached++;
+          }
+        });
+
+        /* Report progress after batch */
+        if (onProgress) {
+          onProgress(batchEnd, modules.length, cached);
         }
 
-        /* Report progress after fetching */
-        if (onProgress) {
-          onProgress(i + 1, modules.length, cached);
+        /* Add small delay between batches to be respectful to GitHub */
+        if (batchEnd < modules.length) {
+          await new Promise((resolve) => setTimeout(resolve, BATCH_DELAY));
         }
       }
 

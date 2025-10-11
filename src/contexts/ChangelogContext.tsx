@@ -1,5 +1,7 @@
 import { ReactNode, useCallback, useEffect, useState } from 'react';
 
+import { toast } from 'sonner';
+
 import { useChangelogCache } from '../hooks/useChangelogCache';
 import { useIndexedDB } from '../hooks/useIndexedDB';
 import { useLocalStorage } from '../hooks/useLocalStorage';
@@ -35,6 +37,8 @@ export function ChangelogProvider({ children }: ChangelogProviderProps) {
   });
   const [changelogs, setChangelogs] = useState<ChangelogResult[]>([]);
   const [errors, setErrors] = useState<string[]>([]);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [_currentRequestId, setCurrentRequestId] = useState<string | null>(null);
 
   const { getNpmPackage, setNpmPackage } = useIndexedDB();
   const { fetchChangelogs, clearCache: clearCacheImpl, dbReady } = useChangelogCache();
@@ -49,9 +53,13 @@ export function ChangelogProvider({ children }: ChangelogProviderProps) {
   const loadChangelogs = useCallback(
     async (modules: string[], branch: string, forceRefresh = false) => {
       if (modules.length === 0) {
-        alert('Please select at least one module');
+        toast.warning('Please select at least one module');
         return;
       }
+
+      /* Generate unique request ID to prevent race conditions */
+      const requestId = `${Date.now()}-${Math.random()}`;
+      setCurrentRequestId(requestId);
 
       /* Track which modules are new (not in current changelogs) */
       const previousModules = new Set(changelogs.map((c) => c.module));
@@ -99,28 +107,43 @@ export function ChangelogProvider({ children }: ChangelogProviderProps) {
         new Promise((resolve) => setTimeout(resolve, 1000)),
       ]);
 
-      const successful = results.filter((r) => !r.error);
-      const failed = results.filter((r) => r.error).map((r) => `${r.module}: ${r.error}`);
+      /* Check if this request is still current - if not, discard results */
+      setCurrentRequestId((current) => {
+        if (current !== requestId) {
+          console.log('Discarding stale request results');
+          return current; /* Keep the current request ID */
+        }
 
-      if (isIncrementalLoad) {
-        /* Merge new results with existing changelogs, new ones first */
-        setChangelogs((prev) => [...successful, ...prev]);
-        setErrors((prev) => [...prev, ...failed]);
-      } else {
-        /* Sort results: newly added modules first, then others */
-        const sortedResults = successful.sort((a, b) => {
-          const aIsNew = newlyAddedModules.includes(a.module);
-          const bIsNew = newlyAddedModules.includes(b.module);
-          if (aIsNew && !bIsNew) return -1;
-          if (!aIsNew && bIsNew) return 1;
-          return 0;
-        });
+        /* This is the current request, process results */
+        const successful = results.filter((r) => !r.error);
+        const failed = results.filter((r) => r.error).map((r) => `${r.module}: ${r.error}`);
 
-        setChangelogs(sortedResults);
-        setErrors(failed);
-      }
+        if (isIncrementalLoad) {
+          /* Merge new results with existing changelogs, new ones first */
+          setChangelogs((prev) => {
+            /* Deduplicate: keep new results, then add old ones that aren't duplicates */
+            const moduleSet = new Set(successful.map((c) => c.module));
+            const uniquePrev = prev.filter((c) => !moduleSet.has(c.module));
+            return [...successful, ...uniquePrev];
+          });
+          setErrors((prev) => [...prev, ...failed]);
+        } else {
+          /* Sort results: newly added modules first, then others */
+          const sortedResults = successful.sort((a, b) => {
+            const aIsNew = newlyAddedModules.includes(a.module);
+            const bIsNew = newlyAddedModules.includes(b.module);
+            if (aIsNew && !bIsNew) return -1;
+            if (!aIsNew && bIsNew) return 1;
+            return 0;
+          });
 
-      setLoadingState((prev) => ({ ...prev, loading: false }));
+          setChangelogs(sortedResults);
+          setErrors(failed);
+        }
+
+        setLoadingState((prev) => ({ ...prev, loading: false }));
+        return null; /* Clear current request ID */
+      });
     },
     [fetchChangelogs, setViewedModules, changelogs]
   );
