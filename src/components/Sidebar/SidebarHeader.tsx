@@ -33,13 +33,20 @@ export function SidebarHeader() {
     <div className="p-5 pr-12 md:pr-5 border-b flex items-center justify-between">
       <h1 className="text-lg font-bold">Expo Changelogs Viewer</h1>
       <div className="flex gap-1">
-        <Button asChild size="icon" title="View on GitHub" variant="ghost">
+        <Button
+          aria-label="View project on GitHub"
+          asChild
+          size="icon"
+          title="View on GitHub"
+          variant="ghost"
+        >
           <a
             href="https://github.com/efstathiosntonas/expo-changelog-viewer"
             rel="noopener noreferrer"
             target="_blank"
           >
             <svg
+              aria-hidden="true"
               className="h-4 w-4"
               fill="currentColor"
               viewBox="0 0 24 24"
@@ -51,8 +58,13 @@ export function SidebarHeader() {
         </Button>
         <AlertDialog onOpenChange={setClearDialogOpen} open={clearDialogOpen}>
           <AlertDialogTrigger asChild>
-            <Button size="icon" title="Clear storage and cache" variant="ghost">
-              <Trash2 className="h-4 w-4" />
+            <Button
+              aria-label="Clear all storage and cache data"
+              size="icon"
+              title="Clear storage and cache"
+              variant="ghost"
+            >
+              <Trash2 aria-hidden="true" className="h-4 w-4" />
             </Button>
           </AlertDialogTrigger>
           <AlertDialogContent
@@ -72,13 +84,19 @@ export function SidebarHeader() {
             </AlertDialogFooter>
           </AlertDialogContent>
         </AlertDialog>
-        <Button onClick={toggleTheme} size="icon" title={`Theme: ${theme}`} variant="ghost">
+        <Button
+          aria-label="Toggle theme"
+          onClick={toggleTheme}
+          size="icon"
+          title={`Theme: ${theme}`}
+          variant="ghost"
+        >
           {theme === 'dark' ? (
-            <Moon className="h-4 w-4" />
+            <Moon aria-hidden="true" className="h-4 w-4" />
           ) : theme === 'light' ? (
-            <Sun className="h-4 w-4" />
+            <Sun aria-hidden="true" className="h-4 w-4" />
           ) : (
-            <Monitor className="h-4 w-4" />
+            <Monitor aria-hidden="true" className="h-4 w-4" />
           )}
         </Button>
       </div>
