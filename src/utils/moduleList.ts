@@ -95,8 +95,8 @@ export const EXPO_MODULES: ExpoModule[] = [
 export const CATEGORIES = Array.from(new Set(EXPO_MODULES.map((m) => m.category))).sort();
 
 export const SDK_VERSIONS = [
-  { value: 'main', label: '🔥 Next (unversioned)' },
   { value: 'sdk-54', label: 'SDK 54 (latest)' },
+  { value: 'main', label: '🔥 Next (unversioned)' },
   { value: 'sdk-53', label: 'SDK 53' },
   { value: 'sdk-52', label: 'SDK 52' },
   { value: 'sdk-51', label: 'SDK 51' },
