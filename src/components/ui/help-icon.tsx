@@ -20,7 +20,10 @@ export function HelpIcon({ children, className = 'h-3.5 w-3.5' }: HelpIconProps)
       <div className="hidden md:block">
         <Tooltip>
           <TooltipTrigger asChild>
-            <button className="text-muted-foreground hover:text-foreground transition-colors" type="button">
+            <button
+              className="text-muted-foreground hover:text-foreground transition-colors"
+              type="button"
+            >
               <HelpCircle className={className} />
             </button>
           </TooltipTrigger>
@@ -32,7 +35,10 @@ export function HelpIcon({ children, className = 'h-3.5 w-3.5' }: HelpIconProps)
       <div className="md:hidden">
         <Popover>
           <PopoverTrigger asChild>
-            <button className="text-muted-foreground hover:text-foreground transition-colors" type="button">
+            <button
+              className="text-muted-foreground hover:text-foreground transition-colors"
+              type="button"
+            >
               <HelpCircle className={className} />
             </button>
           </PopoverTrigger>

@@ -1,7 +1,5 @@
-import { HelpCircle } from 'lucide-react';
-
 import { Button } from '@/components/ui/button';
-import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
+import { HelpIcon } from '@/components/ui/help-icon';
 
 interface ModuleSelectionActionsProps {
   onClearAll: () => void;
@@ -18,21 +16,14 @@ export function ModuleSelectionActions({ onSelectAll, onClearAll }: ModuleSelect
         <div className="relative flex justify-center text-xs">
           <span className="bg-muted/40 px-2 text-muted-foreground flex items-center gap-1.5">
             Module Selection
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <button className="hover:text-foreground transition-colors" type="button">
-                  <HelpCircle className="h-3 w-3" />
-                </button>
-              </TooltipTrigger>
-              <TooltipContent className="max-w-xs">
-                <p className="font-semibold mb-1">Bulk module selection</p>
-                <p className="text-xs">
-                  &quot;Select All&quot; checks all visible modules in the current category/search.
-                  &quot;Clear&quot; unchecks them all. Or use checkboxes below to pick individual
-                  modules.
-                </p>
-              </TooltipContent>
-            </Tooltip>
+            <HelpIcon className="h-3 w-3">
+              <p className="font-semibold mb-1">Bulk module selection</p>
+              <p className="text-xs">
+                &quot;Select All&quot; checks all visible modules in the current category/search.
+                &quot;Clear&quot; unchecks them all. Or use checkboxes below to pick individual
+                modules.
+              </p>
+            </HelpIcon>
           </span>
         </div>
       </div>

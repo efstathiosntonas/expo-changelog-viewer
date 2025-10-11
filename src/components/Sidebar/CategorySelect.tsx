@@ -1,5 +1,6 @@
-import { HelpCircle } from 'lucide-react';
+import { CATEGORIES } from '@/utils/moduleList';
 
+import { HelpIcon } from '@/components/ui/help-icon';
 import {
   Select,
   SelectContent,
@@ -7,9 +8,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
-
-import { CATEGORIES } from '@/utils/moduleList';
 
 interface CategorySelectProps {
   onCategoryChange: (category: string) => void;
@@ -26,20 +24,13 @@ export function CategorySelect({ selectedCategory, onCategoryChange }: CategoryS
         <div className="relative flex justify-center text-xs">
           <span className="bg-muted/40 px-2 text-muted-foreground flex items-center gap-1.5">
             Category Filter
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <button className="hover:text-foreground transition-colors" type="button">
-                  <HelpCircle className="h-3 w-3" />
-                </button>
-              </TooltipTrigger>
-              <TooltipContent className="max-w-xs">
-                <p className="font-semibold mb-1">Filter modules by category</p>
-                <p className="text-xs">
-                  Narrow down the module list by selecting a category (e.g., Camera, Location,
-                  Authentication, etc.).
-                </p>
-              </TooltipContent>
-            </Tooltip>
+            <HelpIcon className="h-3 w-3">
+              <p className="font-semibold mb-1">Filter modules by category</p>
+              <p className="text-xs">
+                Narrow down the module list by selecting a category (e.g., Camera, Location,
+                Authentication, etc.).
+              </p>
+            </HelpIcon>
           </span>
         </div>
       </div>

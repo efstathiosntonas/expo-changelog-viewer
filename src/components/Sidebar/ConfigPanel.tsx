@@ -138,8 +138,8 @@ export function ConfigPanel() {
             <HelpIcon>
               <p className="font-semibold mb-1">Choose Expo SDK version</p>
               <p className="text-xs">
-                Select which SDK version&apos;s changelogs to fetch. Each SDK has its own
-                changelog branch with version-specific updates.
+                Select which SDK version&apos;s changelogs to fetch. Each SDK has its own changelog
+                branch with version-specific updates.
               </p>
             </HelpIcon>
           </div>
@@ -206,8 +206,8 @@ export function ConfigPanel() {
             <HelpIcon>
               <p className="font-semibold mb-1">Filter versions by release date</p>
               <p className="text-xs mb-2">
-                &quot;After last visit&quot; shows only versions released since you last marked
-                the module as viewed.
+                &quot;After last visit&quot; shows only versions released since you last marked the
+                module as viewed.
               </p>
               <p className="text-xs text-muted-foreground">
                 Works with Version Limit and Hide unchanged filters.
