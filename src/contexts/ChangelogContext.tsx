@@ -1,8 +1,10 @@
-import { ReactNode, useCallback, useState } from 'react';
+import { ReactNode, useCallback, useEffect, useState } from 'react';
 
 import { useChangelogCache } from '../hooks/useChangelogCache';
+import { useIndexedDB } from '../hooks/useIndexedDB';
 import { useLocalStorage } from '../hooks/useLocalStorage';
 import { type DateFilterType } from '../utils/dateFilter';
+import { initNpmCache } from '../utils/npmDependencyComparer';
 import { ChangelogContext } from './ChangelogContext.context';
 
 import type { ChangelogResult } from '../hooks/useChangelogCache';
@@ -34,13 +36,26 @@ export function ChangelogProvider({ children }: ChangelogProviderProps) {
   const [changelogs, setChangelogs] = useState<ChangelogResult[]>([]);
   const [errors, setErrors] = useState<string[]>([]);
 
+  const { getNpmPackage, setNpmPackage } = useIndexedDB();
   const { fetchChangelogs, clearCache: clearCacheImpl, dbReady } = useChangelogCache();
+
+  /* Initialize npm cache on mount */
+  useEffect(() => {
+    if (getNpmPackage && setNpmPackage) {
+      initNpmCache({ get: getNpmPackage, set: setNpmPackage });
+    }
+  }, [getNpmPackage, setNpmPackage]);
 
   const loadChangelogs = useCallback(
     async (modules: string[], branch: string, forceRefresh = false) => {
       if (modules.length === 0) {
         alert('Please select at least one module');
         return;
+      }
+
+      /* Clear viewed modules on force refresh to start fresh */
+      if (forceRefresh) {
+        setViewedModules([]);
       }
 
       setLoadingState({
@@ -53,10 +68,10 @@ export function ChangelogProvider({ children }: ChangelogProviderProps) {
 
       /* Add a 1-second minimum loading time to show progress */
       const [results] = await Promise.all([
-        fetchChangelogs(modules, branch, forceRefresh, (loaded, total, cached) => {
+        fetchChangelogs(modules, branch, forceRefresh, (loaded, total, cached, currentModule) => {
           setLoadingState((prev) => ({
             ...prev,
-            progress: { loaded, total, cached },
+            progress: { loaded, total, cached, currentModule },
           }));
         }),
         new Promise((resolve) => setTimeout(resolve, 1000)),
@@ -69,7 +84,7 @@ export function ChangelogProvider({ children }: ChangelogProviderProps) {
       setErrors(failed);
       setLoadingState((prev) => ({ ...prev, loading: false }));
     },
-    [fetchChangelogs]
+    [fetchChangelogs, setViewedModules]
   );
 
   const clearCache = useCallback(async () => {

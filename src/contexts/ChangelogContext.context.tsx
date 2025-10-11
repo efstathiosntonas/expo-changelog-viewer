@@ -6,6 +6,7 @@ import { type DateFilterType } from '@/utils/dateFilter';
 
 interface LoadProgress {
   cached: number;
+  currentModule?: string;
   loaded: number;
   total: number;
 }

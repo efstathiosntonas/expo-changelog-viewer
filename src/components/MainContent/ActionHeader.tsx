@@ -13,12 +13,19 @@ import { getDateFilterCutoff } from '@/utils/dateFilter';
 
 interface ActionHeaderProps {
   allExpanded: boolean;
+  onClearAllViewed: () => void;
   onCollapseAll: () => void;
   onExport: () => void;
 }
 
-export function ActionHeader({ onCollapseAll, onExport, allExpanded }: ActionHeaderProps) {
-  const { changelogs, hideUnchanged, dateFilter, moduleLastViewed } = useChangelogContext();
+export function ActionHeader({
+  onCollapseAll,
+  onExport,
+  onClearAllViewed,
+  allExpanded,
+}: ActionHeaderProps) {
+  const { changelogs, hideUnchanged, dateFilter, moduleLastViewed, viewedModules } =
+    useChangelogContext();
 
   const hiddenCount = useMemo(() => {
     if (!hideUnchanged) return 0;
@@ -59,7 +66,7 @@ export function ActionHeader({ onCollapseAll, onExport, allExpanded }: ActionHea
           </p>
         )}
       </div>
-      <div className="flex gap-2 md:gap-3 w-full sm:w-auto">
+      <div className="flex gap-2 md:gap-3 w-full sm:w-auto flex-wrap">
         <Button
           className="flex-1 sm:flex-none text-sm md:text-base"
           onClick={onCollapseAll}
@@ -67,6 +74,15 @@ export function ActionHeader({ onCollapseAll, onExport, allExpanded }: ActionHea
         >
           {allExpanded ? 'Collapse All' : 'Expand All'}
         </Button>
+        {viewedModules.length > 0 && (
+          <Button
+            className="flex-1 sm:flex-none text-sm md:text-base"
+            onClick={onClearAllViewed}
+            variant="outline"
+          >
+            Clear All Viewed ({viewedModules.length})
+          </Button>
+        )}
         <Button className="flex-1 sm:flex-none text-sm md:text-base" onClick={onExport}>
           Export Markdown
         </Button>

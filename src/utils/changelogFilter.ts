@@ -1,6 +1,9 @@
+import type { DependencyTreeNode } from './dependencyTreeBuilder';
+
 export interface ChangelogVersion {
   content: string;
   date?: Date | null;
+  dependencyTrees?: DependencyTreeNode[];
   version: string;
 }
 
@@ -137,4 +140,16 @@ export function hasNoUserFacingChanges(content: string): boolean {
   return versions.every((version) =>
     noChangesPatterns.some((pattern) => pattern.test(version.content))
   );
+}
+
+/**
+ * Check if a specific version has no user-facing changes
+ */
+export function isNoChangeVersion(version: ChangelogVersion): boolean {
+  const noChangesPatterns = [
+    /this version does not introduce any user-facing changes/i,
+    /no user-facing changes/i,
+  ];
+
+  return noChangesPatterns.some((pattern) => pattern.test(version.content));
 }

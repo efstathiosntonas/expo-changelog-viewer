@@ -1,7 +1,11 @@
 import { useCallback } from 'react';
 
+import { enrichChangelogWithDependencies } from '@/utils/changelogEnricher';
+import { parseChangelog } from '@/utils/changelogFilter';
+
 import { useIndexedDB } from './useIndexedDB';
 
+import type { ChangelogVersion } from '@/utils/changelogFilter';
 import type { CachedChangelog } from './useIndexedDB';
 
 const GITHUB_RAW_URL = 'https://raw.githubusercontent.com/expo/expo';
@@ -16,6 +20,7 @@ const TTL_CONFIG = {
 export interface ChangelogResult {
   cached: boolean;
   content: string;
+  enrichedVersions?: ChangelogVersion[];
   error?: string;
   fetchedAt?: number;
   module: string;
@@ -123,25 +128,57 @@ export function useChangelogCache() {
       modules: string[],
       branch: string,
       forceRefresh = false,
-      onProgress?: (loaded: number, total: number, cached: number) => void
+      onProgress?: (loaded: number, total: number, cached: number, currentModule?: string) => void
     ): Promise<ChangelogResult[]> => {
       const results: ChangelogResult[] = [];
       let cached = 0;
 
+      /* Fetch all changelogs first */
       for (let i = 0; i < modules.length; i++) {
-        const result = await fetchChangelog(modules[i], branch, forceRefresh);
+        const currentModule = modules[i];
+
+        /* Report progress before fetching */
+        if (onProgress) {
+          onProgress(i, modules.length, cached, currentModule);
+        }
+
+        const result = await fetchChangelog(currentModule, branch, forceRefresh);
         results.push(result);
 
         if (result.cached) {
           cached++;
         }
 
+        /* Report progress after fetching */
         if (onProgress) {
           onProgress(i + 1, modules.length, cached);
         }
       }
 
-      return results;
+      /* Enrich changelogs with dependency information in parallel */
+      const enrichedResults = await Promise.all(
+        results.map(async (result) => {
+          /* Skip enrichment if there was an error fetching */
+          if (result.error || !result.content) {
+            return result;
+          }
+
+          try {
+            const versions = parseChangelog(result.content);
+            const enrichedVersions = await enrichChangelogWithDependencies(result.module, versions);
+
+            return {
+              ...result,
+              enrichedVersions,
+            };
+          } catch (error) {
+            console.warn(`Failed to enrich ${result.module}:`, error);
+            return result;
+          }
+        })
+      );
+
+      return enrichedResults;
     },
     [fetchChangelog]
   );

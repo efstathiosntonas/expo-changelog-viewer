@@ -6,17 +6,19 @@ A modern web application to view and compare changelogs for Expo SDK modules. Bu
 
 - **Static SDK Versions**: Pre-configured SDK versions (SDK 40-54 + main branch) for reliable, instant loading
 - **IndexedDB Caching**: Fast changelog caching with automatic cache invalidation and status indicators
+- **Dependency Tree Analysis**: Automatically traces dependency updates for "no user-facing changes" versions to find root causes
+- **NPM Package Integration**: Fetches and compares package.json dependencies from npm registry
 - **Module Selection**: Browse and select from 80+ Expo modules organized by category
 - **Version Filtering**: Limit versions displayed per module (latest only, last 3, 5, 10, or all)
 - **Smart UI**: Collapsible sections with shadcn/ui components and CVA variants
 - **Search & Filter**: Real-time module search and category filtering
-- **Mark as Viewed**: Track which changelogs you've reviewed with visual indicators
+- **Mark as Viewed**: Track which changelogs you've reviewed with visual indicators (auto-clears on "Fetch Fresh")
 - **Bulk Actions**: Select all, clear all, mark all as viewed/unviewed
 - **Context API**: Centralized state management with React Context
 - **LocalStorage Persistence**: Saves all selections, preferences, viewed state, and last visited timestamps
 - **Export**: Download changelogs as markdown
 - **Light/Dark/Auto Theme**: Follows system preference or manual toggle
-- **Progress Indicators**: Loading states and progress bars for async operations
+- **Enhanced Loading UX**: Rotating funny messages + current module display during load
 - **Error Handling**: User-friendly error messages and fallback states
 - **External Links**: All links open in new tabs
 - **Code Quality**: ESLint 9, Prettier, and Lefthook pre-commit hooks
@@ -68,6 +70,7 @@ yarn preview
 - **react-markdown** - Markdown rendering with GFM support
 - **remark-gfm** - GitHub Flavored Markdown
 - **rehype-raw** - Raw HTML support in markdown
+- **react-complex-tree** - Interactive tree visualization for dependency chains
 - **class-variance-authority** - Component variant styling
 - **lucide-react** - Icon library
 - **ESLint 9** - Code linting with flat config
@@ -85,8 +88,9 @@ src/
       ChangelogItem.tsx    # Individual changelog entry
       ChangelogList.tsx    # List of changelog items
       ErrorDisplay.tsx     # Error message display
-      LoadingState.tsx     # Loading spinner and message
+      LoadingState.tsx     # Loading spinner with rotating messages
       MainContent.tsx      # Main content container
+      VersionWithDependencies.tsx # Version display with dependency tree
     Sidebar/               # Sidebar components
       CategoryFilter.tsx   # Category filter dropdown
       ConfigPanel.tsx      # SDK version and limit controls
@@ -108,17 +112,20 @@ src/
     ChangelogContext.context.tsx # Context type definitions
     ChangelogContext.tsx         # Global state management
   hooks/
-    useChangelogCache.ts   # IndexedDB changelog caching
+    useChangelogCache.ts   # IndexedDB changelog caching with enrichment
     useChangelogContext.ts # Context consumer hook
-    useIndexedDB.ts        # IndexedDB utilities
+    useIndexedDB.ts        # IndexedDB utilities (changelogs + npm packages)
     useLocalStorage.ts     # LocalStorage persistence
     useSDKBranches.ts      # Static SDK version provider
     useTheme.ts            # Theme management (light/dark/system)
   utils/
+    changelogEnricher.ts   # Enriches versions with dependency trees
     changelogFilter.ts     # Version parsing and filtering
     dateFilter.ts          # Date filtering utilities
     dateFormatter.ts       # ISO date formatting for display
+    dependencyTreeBuilder.ts # Builds dependency update chains
     moduleList.ts          # Expo modules catalog with categories and SDK versions
+    npmDependencyComparer.ts # Fetches and compares npm package dependencies
   lib/
     utils.ts               # Utility functions (cn, etc.)
   App.tsx                  # Root component with context provider
@@ -163,9 +170,15 @@ Saves:
 
 ### IndexedDB Caching
 
-- **Database**: `ChangelogCache` with `changelogs` object store
-- **Cache Key**: `${sdkBranch}:${moduleName}`
-- **TTL**: 7 days for changelog data
+- **Database**: `ChangelogCache` with two object stores:
+  - `changelogs`: Stores changelog content
+  - `npmPackages`: Stores npm package.json data
+- **Cache Key**: `${sdkBranch}:${moduleName}` for changelogs, `${packageName}:${version}` for npm
+- **TTL**:
+  - 1 hour for main branch
+  - 24 hours for latest SDK
+  - 7 days for older SDKs
+  - 30 days for npm packages
 - **Cache Status**: Visual indicators for cached vs. fresh data
 - **Performance**: Instant loading for cached changelogs
 
@@ -175,6 +188,22 @@ Saves:
 - **Versions included**: SDK 40-54 + main (unversioned) branch
 - **No rate limiting**: Reliable, instant loading without GitHub API dependency
 - **Easy to update**: Simply update the `SDK_VERSIONS` array in `src/utils/moduleList.ts`
+
+### Dependency Tree Analysis
+
+- **Root Cause Detection**: Automatically analyzes "no user-facing changes" versions to find what actually changed
+- **NPM Integration**: Compares package.json dependencies between versions using npm registry
+- **Recursive Traversal**: Follows dependency chains up to 10 levels deep to find the real changes
+- **Visual Tree Display**: Interactive tree component shows the full dependency update chain
+- **Smart Caching**: Caches npm package data for 30 days to minimize API calls
+- **Dev Dependencies**: Distinguishes between production and dev dependencies with badges
+
+### Enhanced Loading Experience
+
+- **Rotating Messages**: 15 funny loading messages that rotate every 2 seconds
+- **Current Module Display**: Shows which module is currently being loaded
+- **Progress Stats**: Real-time display of loaded/cached/fresh counts
+- **Auto-Clear Viewed**: "Fetch Fresh" automatically clears viewed status for a clean start
 
 ## License
 

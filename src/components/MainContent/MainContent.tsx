@@ -34,6 +34,10 @@ export function MainContent() {
     }
   };
 
+  const handleClearAllViewed = () => {
+    setViewedModules([]);
+  };
+
   const handleExportMarkdown = () => {
     if (changelogs.length === 0) return;
     const markdown = changelogs.map((c) => `# ${c.module}\n\n${c.content}\n\n---\n`).join('\n');
@@ -54,6 +58,7 @@ export function MainContent() {
         <CacheStatusBanner />
         <ActionHeader
           allExpanded={allExpanded}
+          onClearAllViewed={handleClearAllViewed}
           onCollapseAll={handleCollapseAll}
           onExport={handleExportMarkdown}
         />

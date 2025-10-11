@@ -1,9 +1,6 @@
 import { forwardRef, useEffect, useImperativeHandle, useMemo, useState } from 'react';
 
 import { ChevronRight } from 'lucide-react';
-import ReactMarkdown from 'react-markdown';
-import rehypeRaw from 'rehype-raw';
-import remarkGfm from 'remark-gfm';
 
 import { type ChangelogResult } from '@/hooks/useChangelogCache';
 import { useChangelogContext } from '@/hooks/useChangelogContext';
@@ -14,7 +11,6 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 
 import {
-  combineVersions,
   filterOutNoChangeVersions,
   filterVersions,
   filterVersionsByDate,
@@ -22,7 +18,8 @@ import {
   parseChangelog,
 } from '@/utils/changelogFilter';
 import { getDateFilterCutoff } from '@/utils/dateFilter';
-import { formatDatesInMarkdown } from '@/utils/dateFormatter';
+
+import { VersionWithDependencies } from './VersionWithDependencies';
 
 interface ChangelogItemProps {
   changelog: ChangelogResult;
@@ -42,7 +39,8 @@ export const ChangelogItem = forwardRef<ChangelogItemRef, ChangelogItemProps>(
 
     const [cacheLabel, setCacheLabel] = useState('');
 
-    const versions = parseChangelog(changelog.content);
+    /* Use enriched versions if available, otherwise parse from content */
+    const versions = changelog.enrichedVersions || parseChangelog(changelog.content);
 
     /* Apply filtering pipeline */
     const { filteredVersions, filteredByDate, cutoffDate, hasNoChanges } = useMemo(() => {
@@ -81,7 +79,6 @@ export const ChangelogItem = forwardRef<ChangelogItemRef, ChangelogItemProps>(
     ]);
 
     const [isExpanded, setIsExpanded] = useState(hasNoChanges ? false : defaultExpanded);
-    const displayContent = formatDatesInMarkdown(combineVersions(filteredVersions));
 
     useImperativeHandle(ref, () => ({
       setExpanded: (expanded: boolean) => setIsExpanded(expanded),
@@ -119,6 +116,7 @@ export const ChangelogItem = forwardRef<ChangelogItemRef, ChangelogItemProps>(
     return (
       <Collapsible
         className={`border rounded-lg bg-card transition-all ${isViewed ? 'opacity-40' : ''}`}
+        data-module={changelog.module}
         onOpenChange={setIsExpanded}
         open={isExpanded}
       >
@@ -197,15 +195,13 @@ export const ChangelogItem = forwardRef<ChangelogItemRef, ChangelogItemProps>(
         <CollapsibleContent>
           <div className="px-3 md:px-5 pb-4 md:pb-5 border-t pt-3 md:pt-4">
             <div className="prose dark:prose-invert max-w-none prose-sm">
-              <ReactMarkdown
-                components={{
-                  a: ({ ...props }) => <a {...props} rel="noopener noreferrer" target="_blank" />,
-                }}
-                rehypePlugins={[rehypeRaw]}
-                remarkPlugins={[remarkGfm]}
-              >
-                {displayContent || 'No changelog content available'}
-              </ReactMarkdown>
+              {filteredVersions.length > 0 ? (
+                filteredVersions.map((version, idx) => (
+                  <VersionWithDependencies key={`${version.version}-${idx}`} version={version} />
+                ))
+              ) : (
+                <p className="text-muted-foreground">No changelog content available</p>
+              )}
             </div>
           </div>
         </CollapsibleContent>

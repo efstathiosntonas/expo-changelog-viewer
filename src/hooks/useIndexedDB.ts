@@ -1,8 +1,9 @@
 import { useCallback, useEffect, useState } from 'react';
 
 const DB_NAME = 'expo-changelog-db';
-const DB_VERSION = 3; /* Bump to force re-hydration if cache structure changes */
-const STORE_NAME = 'changelogs';
+const DB_VERSION = 5; /* Bump to force re-hydration if cache structure changes */
+const CHANGELOG_STORE = 'changelogs';
+const NPM_STORE = 'npm-packages';
 
 export interface CachedChangelog {
   branch: string;
@@ -13,10 +14,21 @@ export interface CachedChangelog {
   ttl: number;
 }
 
+export interface CachedNpmPackage {
+  dependencies: Record<string, string>;
+  devDependencies: Record<string, string>;
+  fetchedAt: number;
+  key: string; // packageName:version
+  packageName: string;
+  peerDependencies: Record<string, string>;
+  ttl: number;
+  version: string;
+}
+
 /**
  * Validates a cached changelog entry
  */
-function validateEntry(entry: unknown): entry is CachedChangelog {
+function validateChangelogEntry(entry: unknown): entry is CachedChangelog {
   if (!entry || typeof entry !== 'object') {
     return false;
   }
@@ -31,6 +43,30 @@ function validateEntry(entry: unknown): entry is CachedChangelog {
     typeof obj.fetchedAt === 'number' &&
     typeof obj.ttl === 'number' &&
     obj.content.length > 0 &&
+    !isNaN(obj.fetchedAt)
+  );
+}
+
+/**
+ * Validates a cached npm package entry
+ */
+function validateNpmEntry(entry: unknown): entry is CachedNpmPackage {
+  if (!entry || typeof entry !== 'object') {
+    return false;
+  }
+
+  const obj = entry as Record<string, unknown>;
+
+  return (
+    typeof obj.key === 'string' &&
+    typeof obj.packageName === 'string' &&
+    typeof obj.version === 'string' &&
+    typeof obj.fetchedAt === 'number' &&
+    typeof obj.ttl === 'number' &&
+    typeof obj.dependencies === 'object' &&
+    typeof obj.peerDependencies === 'object' &&
+    /* devDependencies is optional for backward compatibility */
+    (typeof obj.devDependencies === 'object' || obj.devDependencies === undefined) &&
     !isNaN(obj.fetchedAt)
   );
 }
@@ -58,15 +94,24 @@ function openDB(): Promise<IDBDatabase> {
         const db = (event.target as IDBOpenDBRequest).result;
 
         /* Delete old stores if they exist */
-        if (db.objectStoreNames.contains(STORE_NAME)) {
-          db.deleteObjectStore(STORE_NAME);
+        if (db.objectStoreNames.contains(CHANGELOG_STORE)) {
+          db.deleteObjectStore(CHANGELOG_STORE);
+        }
+        if (db.objectStoreNames.contains(NPM_STORE)) {
+          db.deleteObjectStore(NPM_STORE);
         }
 
-        /* Create the new store */
-        const store = db.createObjectStore(STORE_NAME, { keyPath: 'key' });
-        store.createIndex('module', 'module', { unique: false });
-        store.createIndex('branch', 'branch', { unique: false });
-        store.createIndex('fetchedAt', 'fetchedAt', { unique: false });
+        /* Create changelog store */
+        const changelogStore = db.createObjectStore(CHANGELOG_STORE, { keyPath: 'key' });
+        changelogStore.createIndex('module', 'module', { unique: false });
+        changelogStore.createIndex('branch', 'branch', { unique: false });
+        changelogStore.createIndex('fetchedAt', 'fetchedAt', { unique: false });
+
+        /* Create npm package store */
+        const npmStore = db.createObjectStore(NPM_STORE, { keyPath: 'key' });
+        npmStore.createIndex('packageName', 'packageName', { unique: false });
+        npmStore.createIndex('version', 'version', { unique: false });
+        npmStore.createIndex('fetchedAt', 'fetchedAt', { unique: false });
       };
     } catch (error) {
       console.error('IndexedDB not supported:', error);
@@ -87,20 +132,20 @@ export function useIndexedDB() {
       });
   }, []);
 
-  const get = useCallback(
+  const getChangelog = useCallback(
     async (key: string): Promise<CachedChangelog | null> => {
       if (!dbReady) return null;
 
       try {
         const db = await openDB();
-        const transaction = db.transaction(STORE_NAME, 'readonly');
-        const store = transaction.objectStore(STORE_NAME);
+        const transaction = db.transaction(CHANGELOG_STORE, 'readonly');
+        const store = transaction.objectStore(CHANGELOG_STORE);
         const request = store.get(key);
 
         return new Promise((resolve) => {
           request.onsuccess = () => {
             const result = request.result;
-            if (result && validateEntry(result)) {
+            if (result && validateChangelogEntry(result)) {
               resolve(result);
             } else {
               if (result) {
@@ -111,7 +156,7 @@ export function useIndexedDB() {
           };
           request.onerror = () => {
             console.error('IndexedDB get error:', request.error);
-            resolve(null); /* Don't reject, just return null */
+            resolve(null);
           };
         });
       } catch (error) {
@@ -122,30 +167,91 @@ export function useIndexedDB() {
     [dbReady]
   );
 
-  const set = useCallback(
+  const setChangelog = useCallback(
     async (entry: CachedChangelog): Promise<void> => {
       if (!dbReady) return;
 
-      if (!validateEntry(entry)) {
+      if (!validateChangelogEntry(entry)) {
         console.error('Attempted to store invalid entry:', entry);
         return;
       }
 
       try {
         const db = await openDB();
-        const transaction = db.transaction(STORE_NAME, 'readwrite');
-        const store = transaction.objectStore(STORE_NAME);
+        const transaction = db.transaction(CHANGELOG_STORE, 'readwrite');
+        const store = transaction.objectStore(CHANGELOG_STORE);
         store.put(entry);
 
         return new Promise((resolve) => {
           transaction.oncomplete = () => resolve();
           transaction.onerror = () => {
             console.error('IndexedDB set error:', transaction.error);
-            resolve(); /* Don't reject, just log */
+            resolve();
           };
         });
       } catch (error) {
         console.error('IndexedDB set failed:', error);
+      }
+    },
+    [dbReady]
+  );
+
+  const getNpmPackage = useCallback(
+    async (key: string): Promise<CachedNpmPackage | null> => {
+      if (!dbReady) return null;
+
+      try {
+        const db = await openDB();
+        const transaction = db.transaction(NPM_STORE, 'readonly');
+        const store = transaction.objectStore(NPM_STORE);
+        const request = store.get(key);
+
+        return new Promise((resolve) => {
+          request.onsuccess = () => {
+            const result = request.result;
+            if (result && validateNpmEntry(result)) {
+              resolve(result);
+            } else {
+              resolve(null);
+            }
+          };
+          request.onerror = () => {
+            console.error('IndexedDB npm get error:', request.error);
+            resolve(null);
+          };
+        });
+      } catch (error) {
+        console.error('IndexedDB npm get failed:', error);
+        return null;
+      }
+    },
+    [dbReady]
+  );
+
+  const setNpmPackage = useCallback(
+    async (entry: CachedNpmPackage): Promise<void> => {
+      if (!dbReady) return;
+
+      if (!validateNpmEntry(entry)) {
+        console.error('Attempted to store invalid npm entry:', entry);
+        return;
+      }
+
+      try {
+        const db = await openDB();
+        const transaction = db.transaction(NPM_STORE, 'readwrite');
+        const store = transaction.objectStore(NPM_STORE);
+        store.put(entry);
+
+        return new Promise((resolve) => {
+          transaction.oncomplete = () => resolve();
+          transaction.onerror = () => {
+            console.error('IndexedDB npm set error:', transaction.error);
+            resolve();
+          };
+        });
+      } catch (error) {
+        console.error('IndexedDB npm set failed:', error);
       }
     },
     [dbReady]
@@ -156,9 +262,9 @@ export function useIndexedDB() {
 
     try {
       const db = await openDB();
-      const transaction = db.transaction(STORE_NAME, 'readwrite');
-      const store = transaction.objectStore(STORE_NAME);
-      store.clear();
+      const transaction = db.transaction([CHANGELOG_STORE, NPM_STORE], 'readwrite');
+      transaction.objectStore(CHANGELOG_STORE).clear();
+      transaction.objectStore(NPM_STORE).clear();
 
       return new Promise((resolve) => {
         transaction.oncomplete = () => resolve();
@@ -177,14 +283,14 @@ export function useIndexedDB() {
 
     try {
       const db = await openDB();
-      const transaction = db.transaction(STORE_NAME, 'readonly');
-      const store = transaction.objectStore(STORE_NAME);
+      const transaction = db.transaction(CHANGELOG_STORE, 'readonly');
+      const store = transaction.objectStore(CHANGELOG_STORE);
       const request = store.getAll();
 
       return new Promise((resolve) => {
         request.onsuccess = () => {
           const results = request.result || [];
-          const validated = results.filter(validateEntry);
+          const validated = results.filter(validateChangelogEntry);
           if (validated.length !== results.length) {
             console.warn('Some cache entries were invalid and skipped');
           }
@@ -201,5 +307,13 @@ export function useIndexedDB() {
     }
   }, [dbReady]);
 
-  return { get, set, clear, getAll, dbReady };
+  return {
+    get: getChangelog,
+    set: setChangelog,
+    getNpmPackage,
+    setNpmPackage,
+    clear,
+    getAll,
+    dbReady,
+  };
 }

@@ -61,7 +61,6 @@ export const EXPO_MODULES: ExpoModule[] = [
 
   /* Graphics & GL */
   { name: 'expo-gl', category: 'Graphics & GL' },
-  { name: 'expo-processing', category: 'Graphics & GL' },
 
   /* System & Configuration */
   { name: 'expo-application', category: 'System & Configuration' },
@@ -73,14 +72,12 @@ export const EXPO_MODULES: ExpoModule[] = [
   { name: 'expo-doctor', category: 'System & Configuration' },
   { name: 'expo-env-info', category: 'System & Configuration' },
   { name: 'expo-font', category: 'System & Configuration' },
-  { name: 'expo-insights', category: 'System & Configuration' },
   { name: 'expo-intent-launcher', category: 'System & Configuration' },
   { name: 'expo-json-utils', category: 'System & Configuration' },
   { name: 'expo-keep-awake', category: 'System & Configuration' },
   { name: 'expo-localization', category: 'System & Configuration' },
   { name: 'expo-manifests', category: 'System & Configuration' },
   { name: 'expo-network', category: 'System & Configuration' },
-  { name: 'expo-network-addons', category: 'System & Configuration' },
   { name: 'expo-print', category: 'System & Configuration' },
 
   /* Development & Core */
@@ -89,7 +86,6 @@ export const EXPO_MODULES: ExpoModule[] = [
   { name: 'expo-dev-client-components', category: 'Development & Core' },
   { name: 'expo-dev-launcher', category: 'Development & Core' },
   { name: 'expo-dev-menu', category: 'Development & Core' },
-  { name: 'expo-dev-menu-interface', category: 'Development & Core' },
   { name: 'expo-eas-client', category: 'Development & Core' },
   { name: 'expo-modules-autolinking', category: 'Development & Core' },
   { name: 'expo-modules-core', category: 'Development & Core' },

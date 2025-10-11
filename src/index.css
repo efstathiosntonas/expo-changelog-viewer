@@ -74,9 +74,14 @@
 }
 
 @media (min-width: 768px) {
-  .prose {
+  .prose:not(.max-w-none) {
     max-width: 65ch;
   }
+}
+
+/* Ensure max-w-none works on prose */
+.prose.max-w-none {
+  max-width: none !important;
 }
 
 .prose h1,
@@ -271,4 +276,150 @@
 
 .dark .prose th {
   background-color: hsl(var(--muted));
+}
+
+/* React Complex Tree Styling */
+.rct-tree-root {
+  --rct-color-tree-bg: transparent;
+  --rct-item-height: auto;
+  --rct-color-focustree-item-selected-bg: hsl(var(--muted));
+  --rct-color-focustree-item-hover-bg: hsl(var(--muted) / 0.3);
+  --rct-color-focustree-item-focused-border: hsl(var(--primary));
+  --rct-color-nonfocustree-item-selected-bg: hsl(var(--muted));
+  --rct-arrow-size: 10px;
+  --rct-arrow-container-size: 16px;
+  --rct-color-arrow: hsl(var(--foreground));
+}
+
+/* Tree items with responsive indentation */
+.dep-tree-item {
+  margin-bottom: 2px;
+  /* Mobile: 10px per depth level */
+  padding-left: calc((attr(data-depth number, 1) - 1) * 10px);
+}
+
+@media (min-width: 640px) {
+  .dep-tree-item {
+    /* Desktop: 20px per depth level */
+    padding-left: calc((attr(data-depth number, 1) - 1) * 20px);
+  }
+}
+
+/* Fallback for browsers that don't support attr() in calc */
+.dep-tree-item[data-depth='1'] {
+  padding-left: 0;
+}
+.dep-tree-item[data-depth='2'] {
+  padding-left: 10px;
+}
+.dep-tree-item[data-depth='3'] {
+  padding-left: 20px;
+}
+.dep-tree-item[data-depth='4'] {
+  padding-left: 30px;
+}
+.dep-tree-item[data-depth='5'] {
+  padding-left: 40px;
+}
+.dep-tree-item[data-depth='6'] {
+  padding-left: 50px;
+}
+.dep-tree-item[data-depth='7'] {
+  padding-left: 60px;
+}
+
+@media (min-width: 640px) {
+  .dep-tree-item[data-depth='2'] {
+    padding-left: 20px;
+  }
+  .dep-tree-item[data-depth='3'] {
+    padding-left: 40px;
+  }
+  .dep-tree-item[data-depth='4'] {
+    padding-left: 60px;
+  }
+  .dep-tree-item[data-depth='5'] {
+    padding-left: 80px;
+  }
+  .dep-tree-item[data-depth='6'] {
+    padding-left: 100px;
+  }
+  .dep-tree-item[data-depth='7'] {
+    padding-left: 120px;
+  }
+}
+
+/* Tree button styling */
+.dep-tree-button {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  padding: 4px 6px;
+  width: 100%;
+  text-align: left;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+@media (min-width: 640px) {
+  .dep-tree-button {
+    gap: 8px;
+    padding: 4px 8px;
+  }
+}
+
+/* Arrow styling */
+.dep-tree-arrow {
+  margin-top: 2px;
+  flex-shrink: 0;
+  font-size: 12px;
+  font-weight: bold;
+  color: hsl(var(--foreground));
+  opacity: 0.7;
+}
+
+/* Changelog box styling */
+.dep-changelog-box {
+  margin-top: 8px;
+  margin-bottom: 12px;
+  margin-left: 20px;
+  padding: 16px;
+  background: rgb(240 253 244 / 0.5);
+  border: 1px solid rgb(34 197 94 / 0.3);
+  border-radius: 6px;
+  width: fit-content;
+}
+
+.dark .dep-changelog-box {
+  background: rgb(5 46 22 / 0.2);
+  border-color: rgb(34 197 94 / 0.3);
+}
+
+@media (min-width: 640px) {
+  .dep-changelog-box {
+    margin-left: calc(attr(data-depth number, 1) * 20px + 20px);
+  }
+}
+
+/* Make arrows more visible on hover */
+.dep-tree-button:hover .dep-tree-arrow {
+  opacity: 1;
+}
+
+.dep-tree-button:hover {
+  background: hsl(var(--muted) / 0.3);
+}
+
+.dep-tree-button:focus-visible {
+  outline: 1px solid hsl(var(--primary));
+  outline-offset: 1px;
+}
+
+/* Prevent overflow issues */
+.rct-tree-root ul,
+.rct-tree-root li {
+  max-width: 100%;
+  overflow-wrap: break-word;
 }
