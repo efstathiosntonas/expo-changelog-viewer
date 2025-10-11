@@ -423,3 +423,107 @@
   max-width: 100%;
   overflow-wrap: break-word;
 }
+
+/* ============================================
+   ACCESSIBILITY ENHANCEMENTS
+   ============================================ */
+
+/* Reduced Motion Support */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  /* Disable specific animations */
+  .animate-spin,
+  .animate-pulse {
+    animation: none !important;
+  }
+}
+
+/* Enhanced Focus Visible Styles */
+*:focus-visible {
+  outline: 2px solid hsl(var(--primary));
+  outline-offset: 2px;
+  border-radius: 3px;
+}
+
+/* Remove default focus for mouse users */
+*:focus:not(:focus-visible) {
+  outline: none;
+}
+
+/* Button focus styles */
+button:focus-visible,
+[role='button']:focus-visible {
+  outline: 2px solid hsl(var(--primary));
+  outline-offset: 2px;
+}
+
+/* Link focus styles */
+a:focus-visible {
+  outline: 2px solid hsl(var(--primary));
+  outline-offset: 2px;
+  text-decoration: underline;
+}
+
+/* Input focus styles */
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible,
+[role='textbox']:focus-visible,
+[role='combobox']:focus-visible,
+[role='listbox']:focus-visible {
+  outline: 2px solid hsl(var(--primary));
+  outline-offset: 0px;
+  border-color: hsl(var(--primary));
+}
+
+/* Checkbox and radio focus styles */
+input[type='checkbox']:focus-visible,
+input[type='radio']:focus-visible {
+  outline: 2px solid hsl(var(--primary));
+  outline-offset: 2px;
+}
+
+/* Skip to main content link */
+.sr-only:focus {
+  position: absolute;
+  width: auto;
+  height: auto;
+  padding: 1rem;
+  margin: 0;
+  overflow: visible;
+  clip: auto;
+  white-space: normal;
+}
+
+/* Touch Target Size - Minimum 44x44px for WCAG AAA */
+@media (pointer: coarse) {
+  /* Buttons and links need minimum touch target */
+  button:not([role='checkbox']),
+  a,
+  [role='button']:not([role='checkbox']) {
+    min-height: 44px;
+    min-width: 44px;
+  }
+
+  /* Icon-only buttons need padding */
+  button:has(> svg:only-child),
+  [role='button']:has(> svg:only-child) {
+    padding: 12px;
+  }
+
+  /* For checkboxes, ensure the entire row is the touch target, not the checkbox itself */
+  /* The parent container should handle the touch area */
+}
+
+/* Focus within for container elements */
+:focus-within {
+  /* Allows container styling when child has focus */
+}

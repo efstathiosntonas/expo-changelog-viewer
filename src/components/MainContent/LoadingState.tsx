@@ -57,15 +57,22 @@ export function LoadingState({ children }: LoadingStateProps) {
       loadProgress.total > 0 ? (loadProgress.loaded / loadProgress.total) * 100 : 0;
 
     return (
-      <div className="flex items-center justify-center min-h-[calc(100vh-16rem)]">
+      <div
+        aria-busy="true"
+        aria-live="polite"
+        className="flex items-center justify-center min-h-[calc(100vh-16rem)]"
+        role="status"
+      >
         <div className="w-full max-w-md space-y-6">
           <div className="text-center space-y-3">
-            <h3 className="text-2xl font-bold">{funnyMessage}...</h3>
-            <p className="text-lg text-muted-foreground">
+            <h3 aria-label={`${funnyMessage}, please wait`} className="text-2xl font-bold">
+              {funnyMessage}...
+            </h3>
+            <p aria-live="polite" className="text-lg text-muted-foreground">
               {loadProgress.loaded} of {loadProgress.total} modules loaded
             </p>
             {loadProgress.currentModule && (
-              <p className="text-sm text-primary font-mono animate-pulse">
+              <p aria-live="polite" className="text-sm text-primary font-mono animate-pulse">
                 Loading: {loadProgress.currentModule}
               </p>
             )}
@@ -73,7 +80,11 @@ export function LoadingState({ children }: LoadingStateProps) {
               {loadProgress.cached} from cache · {loadProgress.loaded - loadProgress.cached} fresh
             </p>
           </div>
-          <Progress className="w-full" value={progressPercent} />
+          <Progress
+            aria-label={`Loading progress: ${Math.round(progressPercent)}%`}
+            className="w-full"
+            value={progressPercent}
+          />
         </div>
       </div>
     );

@@ -110,9 +110,10 @@ export function ChangelogList({ onToggleViewed, onCollapseAllChange }: Changelog
 
   if (!loading && !isInitializing && sortedChangelogs.length === 0) {
     return (
-      <div className="text-center py-32">
-        <div className="inline-block p-8 bg-muted rounded-2xl mb-4">
+      <div aria-label="No changelogs loaded" className="text-center py-32" role="status">
+        <div aria-hidden="true" className="inline-block p-8 bg-muted rounded-2xl mb-4">
           <svg
+            aria-hidden="true"
             className="w-16 h-16 text-muted-foreground"
             fill="none"
             stroke="currentColor"
@@ -135,12 +136,18 @@ export function ChangelogList({ onToggleViewed, onCollapseAllChange }: Changelog
   }
 
   return (
-    <div className="space-y-4">
+    <div aria-busy={loading} aria-label="Changelog feed" className="space-y-4" role="feed">
       {/* Loading placeholder for incremental loads */}
       {loading && sortedChangelogs.length > 0 && (
-        <div className="border rounded-lg bg-card p-8">
+        <div
+          aria-label={`Loading ${loadProgress.total} module${loadProgress.total > 1 ? 's' : ''}`}
+          aria-live="polite"
+          className="border rounded-lg bg-card p-8"
+          role="status"
+        >
           <div className="flex items-center justify-center gap-3">
             <svg
+              aria-hidden="true"
               className="animate-spin h-5 w-5 text-primary"
               fill="none"
               viewBox="0 0 24 24"
@@ -169,6 +176,7 @@ export function ChangelogList({ onToggleViewed, onCollapseAllChange }: Changelog
 
       {sortedChangelogs.map((changelog) => (
         <ChangelogItem
+          aria-label={`${changelog.module} changelog`}
           changelog={changelog}
           defaultExpanded={true}
           isViewed={viewedModules.includes(changelog.module)}

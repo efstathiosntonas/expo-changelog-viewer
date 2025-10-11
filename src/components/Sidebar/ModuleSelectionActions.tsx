@@ -10,12 +10,12 @@ export function ModuleSelectionActions({ onSelectAll, onClearAll }: ModuleSelect
   return (
     <div className="px-4 py-5 border-b">
       <div className="relative mb-3">
-        <div className="absolute inset-0 flex items-center">
+        <div aria-hidden="true" className="absolute inset-0 flex items-center">
           <span className="w-full border-t" />
         </div>
         <div className="relative flex justify-center text-xs">
           <span className="bg-muted/40 px-2 text-muted-foreground flex items-center gap-1.5">
-            Module Selection
+            <span id="module-selection-label">Module Selection</span>
             <HelpIcon className="h-3 w-3">
               <p className="font-semibold mb-1">Bulk module selection</p>
               <p className="text-xs">
@@ -27,11 +27,23 @@ export function ModuleSelectionActions({ onSelectAll, onClearAll }: ModuleSelect
           </span>
         </div>
       </div>
-      <div className="flex gap-2">
-        <Button className="flex-1" onClick={onSelectAll} size="sm" variant="outline">
+      <div aria-labelledby="module-selection-label" className="flex gap-2" role="group">
+        <Button
+          aria-label="Select all visible modules"
+          className="flex-1"
+          onClick={onSelectAll}
+          size="sm"
+          variant="outline"
+        >
           Select All
         </Button>
-        <Button className="flex-1" onClick={onClearAll} size="sm" variant="outline">
+        <Button
+          aria-label="Clear all visible module selections"
+          className="flex-1"
+          onClick={onClearAll}
+          size="sm"
+          variant="outline"
+        >
           Clear
         </Button>
       </div>

@@ -53,7 +53,12 @@ export function MainContent() {
   };
 
   return (
-    <main className="flex-1 overflow-y-auto">
+    <main
+      aria-label="Changelog content"
+      className="flex-1 overflow-y-auto"
+      id="main-content"
+      role="main"
+    >
       <div className="max-w-7xl mx-auto p-4 pt-20 md:p-8 md:pt-8">
         <CacheStatusBanner />
         <ActionHeader

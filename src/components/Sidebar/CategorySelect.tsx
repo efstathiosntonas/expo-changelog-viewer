@@ -18,12 +18,12 @@ export function CategorySelect({ selectedCategory, onCategoryChange }: CategoryS
   return (
     <div className="px-4 py-5 border-b">
       <div className="relative mb-3">
-        <div className="absolute inset-0 flex items-center">
+        <div aria-hidden="true" className="absolute inset-0 flex items-center">
           <span className="w-full border-t" />
         </div>
         <div className="relative flex justify-center text-xs">
           <span className="bg-muted/40 px-2 text-muted-foreground flex items-center gap-1.5">
-            Category Filter
+            <span id="category-filter-label">Category Filter</span>
             <HelpIcon className="h-3 w-3">
               <p className="font-semibold mb-1">Filter modules by category</p>
               <p className="text-xs">
@@ -36,11 +36,13 @@ export function CategorySelect({ selectedCategory, onCategoryChange }: CategoryS
       </div>
       <Select onValueChange={onCategoryChange} value={selectedCategory}>
         <SelectTrigger
+          aria-describedby="category-filter-label"
+          aria-label="Filter modules by category"
           className={selectedCategory !== 'all' ? 'border-purple-500 dark:border-purple-400' : ''}
         >
           <SelectValue />
         </SelectTrigger>
-        <SelectContent>
+        <SelectContent role="listbox">
           <SelectItem value="all">All Categories</SelectItem>
           {CATEGORIES.map((cat) => (
             <SelectItem key={cat} value={cat}>

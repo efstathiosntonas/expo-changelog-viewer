@@ -54,20 +54,26 @@ export function ActionHeader({
   if (changelogs.length === 0) return null;
 
   return (
-    <div className="mb-4 md:mb-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+    <header className="mb-4 md:mb-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
       <div>
-        <h2 className="text-2xl md:text-3xl font-bold">
+        <h2 className="text-2xl md:text-3xl font-bold" id="changelog-count">
           Changelogs ({visibleCount}
           {hiddenCount > 0 && ` of ${changelogs.length}`})
         </h2>
         {hiddenCount > 0 && (
-          <p className="text-sm text-muted-foreground mt-1">
+          <p aria-live="polite" className="text-sm text-muted-foreground mt-1" role="status">
             {hiddenCount} module{hiddenCount !== 1 ? 's' : ''} hidden (no changes)
           </p>
         )}
       </div>
-      <div className="flex gap-2 md:gap-3 w-full sm:w-auto flex-wrap">
+      <div
+        aria-label="Changelog actions"
+        className="flex gap-2 md:gap-3 w-full sm:w-auto flex-wrap"
+        role="toolbar"
+      >
         <Button
+          aria-expanded={allExpanded}
+          aria-label={allExpanded ? 'Collapse all changelog items' : 'Expand all changelog items'}
           className="flex-1 sm:flex-none text-sm md:text-base"
           onClick={onCollapseAll}
           variant="outline"
@@ -76,6 +82,7 @@ export function ActionHeader({
         </Button>
         {viewedModules.length > 0 && (
           <Button
+            aria-label={`Clear all ${viewedModules.length} viewed module${viewedModules.length !== 1 ? 's' : ''}`}
             className="flex-1 sm:flex-none text-sm md:text-base"
             onClick={onClearAllViewed}
             variant="outline"
@@ -83,10 +90,14 @@ export function ActionHeader({
             Clear All Viewed ({viewedModules.length})
           </Button>
         )}
-        <Button className="flex-1 sm:flex-none text-sm md:text-base" onClick={onExport}>
+        <Button
+          aria-label="Export all changelogs as markdown file"
+          className="flex-1 sm:flex-none text-sm md:text-base"
+          onClick={onExport}
+        >
           Export Markdown
         </Button>
       </div>
-    </div>
+    </header>
   );
 }

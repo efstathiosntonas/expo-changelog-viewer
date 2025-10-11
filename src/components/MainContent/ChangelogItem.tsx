@@ -124,11 +124,18 @@ export const ChangelogItem = forwardRef<ChangelogItemRef, ChangelogItemProps>(
           <div className="flex items-start sm:items-center gap-2 md:gap-3 flex-1 min-w-0">
             <CollapsibleTrigger asChild>
               <Button
+                aria-expanded={isExpanded}
+                aria-label={
+                  isExpanded
+                    ? `Collapse ${changelog.module} changelog`
+                    : `Expand ${changelog.module} changelog`
+                }
                 className="h-7 w-7 md:h-8 md:w-8 flex-shrink-0 mt-0.5 sm:mt-0"
                 size="icon"
                 variant="ghost"
               >
                 <ChevronRight
+                  aria-hidden="true"
                   className={`h-4 w-4 transition-transform ${isExpanded ? 'rotate-90' : ''}`}
                 />
               </Button>
@@ -181,26 +188,37 @@ export const ChangelogItem = forwardRef<ChangelogItemRef, ChangelogItemProps>(
               </span>
             </div>
           </div>
-          <div className="flex items-center gap-1.5 md:gap-2 flex-shrink-0">
-            <span className="text-xs md:text-sm text-muted-foreground hidden sm:inline">
+          <div className="flex items-center gap-1.5 md:gap-2 flex-shrink-0 min-h-[44px]">
+            <label
+              className="text-xs md:text-sm text-muted-foreground hidden sm:inline cursor-pointer"
+              htmlFor={`viewed-${changelog.module}`}
+            >
               {isViewed ? 'Viewed' : 'Get out of the way'}
-            </span>
+            </label>
             <Checkbox
+              aria-label={`Mark ${changelog.module} as ${isViewed ? 'unviewed' : 'viewed'}`}
               checked={isViewed}
+              id={`viewed-${changelog.module}`}
               onCheckedChange={(checked) => onToggleViewed(changelog.module, checked as boolean)}
             />
           </div>
         </div>
 
         <CollapsibleContent>
-          <div className="px-3 md:px-5 pb-4 md:pb-5 border-t pt-3 md:pt-4">
+          <div
+            aria-label={`${changelog.module} changelog details`}
+            className="px-3 md:px-5 pb-4 md:pb-5 border-t pt-3 md:pt-4"
+            role="region"
+          >
             <div className="prose dark:prose-invert max-w-none prose-sm">
               {filteredVersions.length > 0 ? (
                 filteredVersions.map((version, idx) => (
                   <VersionWithDependencies key={`${version.version}-${idx}`} version={version} />
                 ))
               ) : (
-                <p className="text-muted-foreground">No changelog content available</p>
+                <p className="text-muted-foreground" role="status">
+                  No changelog content available
+                </p>
               )}
             </div>
           </div>

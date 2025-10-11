@@ -207,11 +207,11 @@ export function VersionWithDependencies({ version }: VersionWithDependenciesProp
                           )}
                           {hasRealChanges && (
                             <Badge
-                              className="text-[9px] md:text-[10px] px-1 py-0 flex items-center gap-0.5"
+                              className="text-[9px] md:text-[10px] px-1.5 py-0.5 inline-flex items-center gap-1 leading-none"
                               variant="success"
                             >
-                              <Target className="h-2 w-2 md:h-2.5 md:w-2.5" />
-                              <span className="hidden sm:inline">Root</span>
+                              <Target className="h-2.5 w-2.5 md:h-3 md:w-3" />
+                              <span className="leading-none">Root</span>
                             </Badge>
                           )}
                           {noChangelog && !hasRealChanges && (

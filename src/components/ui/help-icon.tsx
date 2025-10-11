@@ -21,13 +21,17 @@ export function HelpIcon({ children, className = 'h-3.5 w-3.5' }: HelpIconProps)
         <Tooltip>
           <TooltipTrigger asChild>
             <button
+              aria-label="Show help information"
               className="text-muted-foreground hover:text-foreground transition-colors"
               type="button"
             >
-              <HelpCircle className={className} />
+              <HelpCircle aria-hidden="true" className={className} />
+              <span className="sr-only">Help</span>
             </button>
           </TooltipTrigger>
-          <TooltipContent className="max-w-xs">{children}</TooltipContent>
+          <TooltipContent className="max-w-xs" role="tooltip">
+            {children}
+          </TooltipContent>
         </Tooltip>
       </div>
 
@@ -36,13 +40,18 @@ export function HelpIcon({ children, className = 'h-3.5 w-3.5' }: HelpIconProps)
         <Popover>
           <PopoverTrigger asChild>
             <button
+              aria-haspopup="dialog"
+              aria-label="Show help information"
               className="text-muted-foreground hover:text-foreground transition-colors"
               type="button"
             >
-              <HelpCircle className={className} />
+              <HelpCircle aria-hidden="true" className={className} />
+              <span className="sr-only">Help</span>
             </button>
           </PopoverTrigger>
-          <PopoverContent className="text-base">{children}</PopoverContent>
+          <PopoverContent aria-label="Help information" className="text-base" role="dialog">
+            {children}
+          </PopoverContent>
         </Popover>
       </div>
     </>

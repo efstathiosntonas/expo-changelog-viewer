@@ -147,10 +147,17 @@ export function ConfigPanel() {
 
   return (
     <TooltipProvider delayDuration={300}>
-      <div className="px-4 py-5 space-y-4 border-b">
+      <div
+        aria-label="Configuration settings"
+        className="px-4 py-5 space-y-4 border-b"
+        role="region"
+      >
         <div>
           <div className="flex items-center gap-1.5 mb-2">
-            <label className="text-xs font-semibold uppercase text-muted-foreground">
+            <label
+              className="text-xs font-semibold uppercase text-muted-foreground"
+              id="sdk-version-label"
+            >
               SDK Version
             </label>
             <HelpIcon>
@@ -166,10 +173,10 @@ export function ConfigPanel() {
             onValueChange={handleBranchChange}
             value={selectedBranch}
           >
-            <SelectTrigger>
+            <SelectTrigger aria-describedby="sdk-version-label" aria-label="Select SDK version">
               <SelectValue placeholder="Select SDK" />
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent role="listbox">
               {sdkVersions.map((v) => (
                 <SelectItem key={v.value} value={v.value}>
                   {v.label}
@@ -181,7 +188,10 @@ export function ConfigPanel() {
 
         <div>
           <div className="flex items-center gap-1.5 mb-2">
-            <label className="text-xs font-semibold uppercase text-muted-foreground">
+            <label
+              className="text-xs font-semibold uppercase text-muted-foreground"
+              id="version-limit-label"
+            >
               Version Limit
             </label>
             <HelpIcon>
@@ -197,7 +207,7 @@ export function ConfigPanel() {
             onValueChange={(val) => setVersionLimit(val === 'all' ? 'all' : parseInt(val))}
             value={versionLimit.toString()}
           >
-            <SelectTrigger>
+            <SelectTrigger aria-describedby="version-limit-label" aria-label="Set version limit">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -218,7 +228,10 @@ export function ConfigPanel() {
 
         <div>
           <div className="flex items-center gap-1.5 mb-2">
-            <label className="text-xs font-semibold uppercase text-muted-foreground">
+            <label
+              className="text-xs font-semibold uppercase text-muted-foreground"
+              id="date-filter-label"
+            >
               Date Filter
             </label>
             <HelpIcon>
@@ -233,7 +246,7 @@ export function ConfigPanel() {
             </HelpIcon>
           </div>
           <Select onValueChange={setDateFilter} value={dateFilter}>
-            <SelectTrigger>
+            <SelectTrigger aria-describedby="date-filter-label" aria-label="Filter by date">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -245,8 +258,14 @@ export function ConfigPanel() {
             </SelectContent>
           </Select>
           {dateFilter !== 'all' && versionLimit !== 'all' && versionLimit < 5 && (
-            <p className="text-xs text-amber-600 dark:text-amber-400 mt-1.5 flex items-start gap-1">
-              <span className="mt-0.5">⚠️</span>
+            <p
+              aria-live="polite"
+              className="text-xs text-amber-600 dark:text-amber-400 mt-1.5 flex items-start gap-1"
+              role="alert"
+            >
+              <span aria-hidden="true" className="mt-0.5">
+                ⚠️
+              </span>
               <span>
                 Version limit may hide filtered versions. Consider increasing limit or set to
                 &quot;All versions&quot;.
@@ -257,6 +276,7 @@ export function ConfigPanel() {
 
         <div className="flex items-center gap-2">
           <Checkbox
+            aria-label="Hide changelog versions with no user-facing changes"
             checked={hideUnchanged}
             id="hide-unchanged"
             onCheckedChange={setHideUnchanged}
@@ -289,11 +309,12 @@ export function ConfigPanel() {
             />
             <div className="flex items-center gap-2">
               <Button
+                aria-label="Import modules from package.json file"
                 className="flex-1 border-purple-500 text-purple-600 hover:bg-purple-50 dark:border-purple-400 dark:text-purple-400 dark:hover:bg-purple-950"
                 onClick={() => fileInputRef.current?.click()}
                 variant="outline"
               >
-                <Upload className="h-4 w-4 mr-2" />
+                <Upload aria-hidden="true" className="h-4 w-4 mr-2" />
                 Import from package.json
               </Button>
               <HelpIcon>
@@ -310,6 +331,8 @@ export function ConfigPanel() {
           </p>
           {importStatus && (
             <p
+              aria-atomic="true"
+              aria-live="polite"
               className={`text-xs text-center py-1 px-2 rounded ${
                 importStatus.startsWith('❌')
                   ? 'bg-red-100 dark:bg-red-950 text-red-700 dark:text-red-300'
@@ -317,6 +340,7 @@ export function ConfigPanel() {
                     ? 'bg-amber-100 dark:bg-amber-950 text-amber-700 dark:text-amber-300'
                     : 'bg-green-100 dark:bg-green-950 text-green-700 dark:text-green-300'
               }`}
+              role="status"
             >
               {importStatus}
             </p>
@@ -328,6 +352,14 @@ export function ConfigPanel() {
 
       <div className="px-4 py-5">
         <Button
+          aria-label={
+            loading
+              ? 'Loading changelogs'
+              : isAlreadyLoaded
+                ? 'Selected modules are already loaded'
+                : `Load ${selectedModules.length} selected module${selectedModules.length !== 1 ? 's' : ''}`
+          }
+          aria-live="polite"
           className="w-full"
           disabled={loading || selectedModules.length === 0 || isAlreadyLoaded}
           onClick={handleLoad}
