@@ -1,5 +1,3 @@
-import { CATEGORIES } from '@/utils/moduleList';
-
 import { HelpIcon } from '@/components/ui/help-icon';
 import {
   Select,
@@ -8,6 +6,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+
+import { CATEGORIES } from '@/utils/moduleList';
 
 interface CategorySelectProps {
   onCategoryChange: (category: string) => void;
