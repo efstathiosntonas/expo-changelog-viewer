@@ -18,7 +18,7 @@ interface SidebarContentProps {
 }
 
 export function SidebarContent({ isMobile = false }: SidebarContentProps) {
-  const { selectedModules, setSelectedModules } = useChangelogContext();
+  const { selectedModules, setSelectedModules, changelogs, setChangelogs } = useChangelogContext();
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
 
@@ -34,6 +34,11 @@ export function SidebarContent({ isMobile = false }: SidebarContentProps) {
     setSelectedModules((prev: string[]) =>
       checked ? [...prev, moduleName] : prev.filter((m: string) => m !== moduleName)
     );
+
+    /* If unchecking and module is loaded, remove it from the changelog list */
+    if (!checked && changelogs.some((c) => c.module === moduleName)) {
+      setChangelogs((prev) => prev.filter((c) => c.module !== moduleName));
+    }
   };
 
   const handleSelectAll = () => {

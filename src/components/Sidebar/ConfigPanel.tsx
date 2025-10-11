@@ -89,9 +89,27 @@ export function ConfigPanel() {
   };
 
   const handleLoad = () => {
+    /* Scroll to top FIRST if there are already loaded modules */
+    if (changelogs.length > 0) {
+      /* Scroll the main element, not the window */
+      const mainElement = document.querySelector('main');
+      if (mainElement) {
+        mainElement.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+    }
+
     closeMobileNav();
     loadChangelogs(selectedModules, selectedBranch, false).catch(console.log);
   };
+
+  /* Check if selected modules exactly match what's already loaded */
+  const loadedModules = new Set(changelogs.map((c) => c.module));
+  const selectedSet = new Set(selectedModules);
+  const isAlreadyLoaded =
+    changelogs.length > 0 &&
+    selectedModules.length === changelogs.length &&
+    selectedModules.every((m) => loadedModules.has(m)) &&
+    changelogs.every((c) => selectedSet.has(c.module));
 
   const handleFileImport = async (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -311,12 +329,14 @@ export function ConfigPanel() {
       <div className="px-4 py-5">
         <Button
           className="w-full"
-          disabled={loading || selectedModules.length === 0}
+          disabled={loading || selectedModules.length === 0 || isAlreadyLoaded}
           onClick={handleLoad}
         >
           {loading
             ? 'Loading...'
-            : `Load ${selectedModules.length} Module${selectedModules.length !== 1 ? 's' : ''}`}
+            : isAlreadyLoaded
+              ? '✓ Already Loaded'
+              : `Load ${selectedModules.length} Module${selectedModules.length !== 1 ? 's' : ''}`}
         </Button>
       </div>
     </TooltipProvider>

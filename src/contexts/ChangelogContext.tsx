@@ -53,6 +53,19 @@ export function ChangelogProvider({ children }: ChangelogProviderProps) {
         return;
       }
 
+      /* Track which modules are new (not in current changelogs) */
+      const previousModules = new Set(changelogs.map((c) => c.module));
+      const newlyAddedModules = modules.filter((m) => !previousModules.has(m));
+
+      /* Incremental load: only fetch new modules if not force refreshing */
+      const modulesToFetch = forceRefresh
+        ? modules
+        : newlyAddedModules.length > 0
+          ? newlyAddedModules
+          : modules;
+      const isIncrementalLoad =
+        !forceRefresh && newlyAddedModules.length > 0 && changelogs.length > 0;
+
       /* Clear viewed modules on force refresh to start fresh */
       if (forceRefresh) {
         setViewedModules([]);
@@ -61,30 +74,55 @@ export function ChangelogProvider({ children }: ChangelogProviderProps) {
       setLoadingState({
         loading: true,
         isInitializing: false,
-        progress: { loaded: 0, total: modules.length, cached: 0 },
+        progress: { loaded: 0, total: modulesToFetch.length, cached: 0 },
       });
-      setChangelogs([]);
-      setErrors([]);
+
+      /* Only clear existing changelogs if force refresh */
+      if (forceRefresh) {
+        setChangelogs([]);
+        setErrors([]);
+      }
 
       /* Add a 1-second minimum loading time to show progress */
       const [results] = await Promise.all([
-        fetchChangelogs(modules, branch, forceRefresh, (loaded, total, cached, currentModule) => {
-          setLoadingState((prev) => ({
-            ...prev,
-            progress: { loaded, total, cached, currentModule },
-          }));
-        }),
+        fetchChangelogs(
+          modulesToFetch,
+          branch,
+          forceRefresh,
+          (loaded, total, cached, currentModule) => {
+            setLoadingState((prev) => ({
+              ...prev,
+              progress: { loaded, total, cached, currentModule },
+            }));
+          }
+        ),
         new Promise((resolve) => setTimeout(resolve, 1000)),
       ]);
 
       const successful = results.filter((r) => !r.error);
       const failed = results.filter((r) => r.error).map((r) => `${r.module}: ${r.error}`);
 
-      setChangelogs(successful);
-      setErrors(failed);
+      if (isIncrementalLoad) {
+        /* Merge new results with existing changelogs, new ones first */
+        setChangelogs((prev) => [...successful, ...prev]);
+        setErrors((prev) => [...prev, ...failed]);
+      } else {
+        /* Sort results: newly added modules first, then others */
+        const sortedResults = successful.sort((a, b) => {
+          const aIsNew = newlyAddedModules.includes(a.module);
+          const bIsNew = newlyAddedModules.includes(b.module);
+          if (aIsNew && !bIsNew) return -1;
+          if (!aIsNew && bIsNew) return 1;
+          return 0;
+        });
+
+        setChangelogs(sortedResults);
+        setErrors(failed);
+      }
+
       setLoadingState((prev) => ({ ...prev, loading: false }));
     },
-    [fetchChangelogs, setViewedModules]
+    [fetchChangelogs, setViewedModules, changelogs]
   );
 
   const clearCache = useCallback(async () => {
@@ -109,6 +147,7 @@ export function ChangelogProvider({ children }: ChangelogProviderProps) {
         moduleLastViewed,
         selectedBranch,
         selectedModules,
+        setChangelogs,
         setDateFilter,
         setHideUnchanged,
         setIsInitializing: (value: boolean) =>
