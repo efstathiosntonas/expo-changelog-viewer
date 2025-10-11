@@ -9,7 +9,8 @@ import { ErrorDisplay } from './ErrorDisplay';
 import { LoadingState } from './LoadingState';
 
 export function MainContent() {
-  const { changelogs, selectedBranch, setViewedModules } = useChangelogContext();
+  const { changelogs, selectedBranch, setViewedModules, setModuleLastViewed } =
+    useChangelogContext();
   const [allExpanded, setAllExpanded] = useState(true);
   const [collapseAllFn, setCollapseAllFn] = useState<((expanded: boolean) => void) | null>(null);
 
@@ -24,6 +25,13 @@ export function MainContent() {
     setViewedModules((prev: string[]) =>
       checked ? [...prev, moduleName] : prev.filter((m: string) => m !== moduleName)
     );
+
+    if (checked) {
+      setModuleLastViewed((prev) => ({
+        ...prev,
+        [moduleName]: Date.now(),
+      }));
+    }
   };
 
   const handleExportMarkdown = () => {

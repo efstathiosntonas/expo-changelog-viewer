@@ -38,8 +38,7 @@ export interface ChangelogItemRef {
 
 export const ChangelogItem = forwardRef<ChangelogItemRef, ChangelogItemProps>(
   ({ changelog, versionLimit, isViewed, onToggleViewed, defaultExpanded = false }, ref) => {
-    const { dateFilter, moduleLastViewed, setModuleLastViewed, hideUnchanged } =
-      useChangelogContext();
+    const { dateFilter, moduleLastViewed, hideUnchanged } = useChangelogContext();
 
     const [cacheLabel, setCacheLabel] = useState('');
 
@@ -116,16 +115,6 @@ export const ChangelogItem = forwardRef<ChangelogItemRef, ChangelogItemProps>(
 
       return () => clearInterval(interval);
     }, [changelog.fetchedAt]);
-
-    /* Update the last viewed timestamp when marking as viewed */
-    useEffect(() => {
-      if (isViewed) {
-        setModuleLastViewed((prev) => ({
-          ...prev,
-          [changelog.module]: Date.now(),
-        }));
-      }
-    }, [isViewed, changelog.module, setModuleLastViewed]);
 
     return (
       <Collapsible
