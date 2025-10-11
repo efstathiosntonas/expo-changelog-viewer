@@ -25,7 +25,9 @@ export interface ChangelogContextType {
   moduleLastViewed: Record<string, number>;
   selectedBranch: string;
   selectedModules: string[];
-  setChangelogs: (changelogs: ChangelogResult[] | ((prev: ChangelogResult[]) => ChangelogResult[])) => void;
+  setChangelogs: (
+    changelogs: ChangelogResult[] | ((prev: ChangelogResult[]) => ChangelogResult[])
+  ) => void;
   setDateFilter: (filter: DateFilterType) => void;
   setHideUnchanged: (hide: boolean) => void;
   setIsInitializing: (value: boolean) => void;
