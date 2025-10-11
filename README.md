@@ -4,7 +4,7 @@ A modern web application to view and compare changelogs for Expo SDK modules. Bu
 
 ## Features
 
-- **Dynamic SDK Branch Loading**: Automatically fetches all available SDK branches from GitHub with 24h caching
+- **Static SDK Versions**: Pre-configured SDK versions (SDK 40-54 + main branch) for reliable, instant loading
 - **IndexedDB Caching**: Fast changelog caching with automatic cache invalidation and status indicators
 - **Module Selection**: Browse and select from 80+ Expo modules organized by category
 - **Version Filtering**: Limit versions displayed per module (latest only, last 3, 5, 10, or all)
@@ -13,7 +13,7 @@ A modern web application to view and compare changelogs for Expo SDK modules. Bu
 - **Mark as Viewed**: Track which changelogs you've reviewed with visual indicators
 - **Bulk Actions**: Select all, clear all, mark all as viewed/unviewed
 - **Context API**: Centralized state management with React Context
-- **LocalStorage Persistence**: Saves all selections, preferences, and viewed state
+- **LocalStorage Persistence**: Saves all selections, preferences, viewed state, and last visited timestamps
 - **Export**: Download changelogs as markdown
 - **Light/Dark/Auto Theme**: Follows system preference or manual toggle
 - **Progress Indicators**: Loading states and progress bars for async operations
@@ -50,7 +50,7 @@ yarn preview
 
 ## Usage
 
-1. **Select SDK Version**: Choose from dynamically loaded SDK branches
+1. **Select SDK Version**: Choose from static SDK versions (SDK 40-54 + main)
 2. **Set Version Limit**: Control how many versions to display
 3. **Choose Modules**: Search, filter by category, or select all
 4. **Load Changelogs**: Click the load button
@@ -112,11 +112,13 @@ src/
     useChangelogContext.ts # Context consumer hook
     useIndexedDB.ts        # IndexedDB utilities
     useLocalStorage.ts     # LocalStorage persistence
-    useSDKBranches.ts      # Dynamic SDK branch fetching with cache
+    useSDKBranches.ts      # Static SDK version provider
     useTheme.ts            # Theme management (light/dark/system)
   utils/
     changelogFilter.ts     # Version parsing and filtering
-    moduleList.ts          # Expo modules catalog with categories
+    dateFilter.ts          # Date filtering utilities
+    dateFormatter.ts       # ISO date formatting for display
+    moduleList.ts          # Expo modules catalog with categories and SDK versions
   lib/
     utils.ts               # Utility functions (cn, etc.)
   App.tsx                  # Root component with context provider
@@ -155,8 +157,9 @@ Saves:
 - SDK branch preference
 - Version limit setting
 - Viewed modules state
+- Module last viewed timestamps
 - Theme preference
-- SDK branches cache (24h TTL)
+- Date filter settings
 
 ### IndexedDB Caching
 
@@ -166,28 +169,12 @@ Saves:
 - **Cache Status**: Visual indicators for cached vs. fresh data
 - **Performance**: Instant loading for cached changelogs
 
-### Dynamic SDK Fetching
+### Static SDK Versions
 
-- Fetches all SDK branches from GitHub API (unauthenticated, rate limit applied to 60/req per hour per IP address)
-- **24-hour cache** to minimize API calls and avoid rate limits
-- Pagination support for 100+ branches
-- **Automatic fallback** to static SDK list if rate limited
-- **Rate limit handling**: GitHub allows 60 requests/hour for unauthenticated requests
-
-### GitHub API Rate Limiting
-
-The app fetches SDK branches from GitHub's public API without authentication:
-
-- **Rate Limit**: 60 requests per hour per IP address
-- **Cache Duration**: 24 hours to minimize API calls
-- **Fallback**: Static SDK list (SDK 40-54) if rate limited
-- **Production Impact**: Minimal - most users will use cached data
-
-If you're developing and hit the rate limit:
-
-1. Wait for the rate limit to reset (check console for time)
-2. The app continues to work with the fallback SDK list
-3. Clear cache only when necessary
+- **No API calls**: Uses a pre-configured static list of SDK versions
+- **Versions included**: SDK 40-54 + main (unversioned) branch
+- **No rate limiting**: Reliable, instant loading without GitHub API dependency
+- **Easy to update**: Simply update the `SDK_VERSIONS` array in `src/utils/moduleList.ts`
 
 ## License
 
