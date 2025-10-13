@@ -1,6 +1,6 @@
 # Expo Changelog Viewer
 
-A modern web application to view and compare changelogs for Expo SDK modules. Built with React 19, TypeScript, shadcn/ui, and Tailwind CSS.
+A web application to view and compare changelogs for Expo SDK modules. Built with shadcn/ui, and Tailwind CSS.
 
 ## Features
 
@@ -8,13 +8,12 @@ A modern web application to view and compare changelogs for Expo SDK modules. Bu
 - **IndexedDB Caching**: Fast changelog caching with automatic cache invalidation and status indicators
 - **Dependency Tree Analysis**: Automatically traces dependency updates for "no user-facing changes" versions to find root causes
 - **NPM Package Integration**: Fetches and compares package.json dependencies from npm registry
-- **Module Selection**: Browse and select from 80+ Expo modules organized by category
+- **Module Selection**: Browse and select from 60+ Expo modules organized by category
 - **Version Filtering**: Limit versions displayed per module (latest only, last 3, 5, 10, or all)
 - **Smart UI**: Collapsible sections with shadcn/ui components and CVA variants
 - **Search & Filter**: Real-time module search and category filtering
 - **Mark as Viewed**: Track which changelogs you've reviewed with visual indicators (auto-clears on "Fetch Fresh")
 - **Bulk Actions**: Select all, clear all, mark all as viewed/unviewed
-- **Context API**: Centralized state management with React Context
 - **LocalStorage Persistence**: Saves all selections, preferences, viewed state, and last visited timestamps
 - **Export**: Download changelogs as markdown
 - **Light/Dark/Auto Theme**: Follows system preference or manual toggle
@@ -73,7 +72,7 @@ yarn preview
 - **react-complex-tree** - Interactive tree visualization for dependency chains
 - **class-variance-authority** - Component variant styling
 - **lucide-react** - Icon library
-- **ESLint 9** - Code linting with flat config
+- **ESLint 9** - Code linting
 - **Prettier** - Code formatting
 - **Lefthook** - Git hooks management
 
