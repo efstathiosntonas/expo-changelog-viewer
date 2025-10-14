@@ -4,6 +4,7 @@ import { Monitor, Moon, Sun, Trash2 } from 'lucide-react';
 
 import { useChangelogContext } from '@/hooks/useChangelogContext';
 import { useTheme } from '@/hooks/useTheme';
+import { clearURLParams } from '@/hooks/useURLSync';
 
 import {
   AlertDialog,
@@ -26,6 +27,7 @@ export function SidebarHeader() {
   const handleClearStorage = async () => {
     await clearCache();
     localStorage.clear();
+    clearURLParams();
     window.location.reload();
   };
 

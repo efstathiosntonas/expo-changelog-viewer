@@ -5,6 +5,7 @@ import { toast } from 'sonner';
 import { useChangelogCache } from '../hooks/useChangelogCache';
 import { useIndexedDB } from '../hooks/useIndexedDB';
 import { useLocalStorage } from '../hooks/useLocalStorage';
+import { getStateFromURL, useURLSync } from '../hooks/useURLSync';
 import { type DateFilterType } from '../utils/dateFilter';
 import { initNpmCache } from '../utils/npmDependencyComparer';
 import { ChangelogContext } from './ChangelogContext.context';
@@ -16,19 +17,43 @@ interface ChangelogProviderProps {
 }
 
 export function ChangelogProvider({ children }: ChangelogProviderProps) {
+  /* Get initial state from URL (takes precedence over localStorage) - only computed once */
+  const [urlState] = useState(getStateFromURL);
+
   const [selectedModules, setSelectedModules] = useLocalStorage<string[]>(
     'expo-selected-modules',
-    []
+    urlState.modules || []
   );
-  const [selectedBranch, setSelectedBranch] = useLocalStorage('expo-selected-branch', 'main');
-  const [versionLimit, setVersionLimit] = useLocalStorage<number | 'all'>('expo-version-limit', 1);
+  const [selectedBranch, setSelectedBranch] = useLocalStorage(
+    'expo-selected-branch',
+    urlState.branch || 'main'
+  );
+  const [versionLimit, setVersionLimit] = useLocalStorage<number | 'all'>(
+    'expo-version-limit',
+    urlState.versionLimit ?? 1
+  );
   const [viewedModules, setViewedModules] = useLocalStorage<string[]>('expo-viewed-modules', []);
-  const [dateFilter, setDateFilter] = useLocalStorage<DateFilterType>('expo-date-filter', 'all');
-  const [hideUnchanged, setHideUnchanged] = useLocalStorage<boolean>('expo-hide-unchanged', false);
+  const [dateFilter, setDateFilter] = useLocalStorage<DateFilterType>(
+    'expo-date-filter',
+    (urlState.dateFilter as DateFilterType) || 'all'
+  );
+  const [hideUnchanged, setHideUnchanged] = useLocalStorage<boolean>(
+    'expo-hide-unchanged',
+    urlState.hideUnchanged ?? false
+  );
   const [moduleLastViewed, setModuleLastViewed] = useLocalStorage<Record<string, number>>(
     'expo-module-last-viewed',
     {}
   );
+
+  /* Sync state with URL parameters */
+  useURLSync({
+    modules: selectedModules,
+    branch: selectedBranch,
+    versionLimit,
+    dateFilter,
+    hideUnchanged,
+  });
 
   const [loadingState, setLoadingState] = useState({
     loading: false,
