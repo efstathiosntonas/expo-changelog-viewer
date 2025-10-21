@@ -1,7 +1,10 @@
 import { ReactNode, useEffect, useState } from 'react';
 
+import { RefreshCw } from 'lucide-react';
+
 import { useChangelogContext } from '@/hooks/useChangelogContext';
 
+import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 
 interface LoadingStateProps {
@@ -27,7 +30,15 @@ const FUNNY_MESSAGES = [
 ];
 
 export function LoadingState({ children }: LoadingStateProps) {
-  const { loading, isInitializing, loadProgress, changelogs } = useChangelogContext();
+  const {
+    loading,
+    isInitializing,
+    loadProgress,
+    changelogs,
+    loadChangelogs,
+    selectedModules,
+    selectedBranch,
+  } = useChangelogContext();
 
   /* Pick a random funny message initially */
   const [messageIndex, setMessageIndex] = useState(() =>
@@ -85,6 +96,16 @@ export function LoadingState({ children }: LoadingStateProps) {
             className="w-full"
             value={progressPercent}
           />
+          <Button
+            aria-label="Fetch fresh changelog data for all modules"
+            className="w-full"
+            onClick={() => loadChangelogs(selectedModules, selectedBranch, true)}
+            size="sm"
+            variant="outline"
+          >
+            <RefreshCw aria-hidden="true" className="h-4 w-4 mr-2" />
+            Fetch Fresh
+          </Button>
         </div>
       </div>
     );
