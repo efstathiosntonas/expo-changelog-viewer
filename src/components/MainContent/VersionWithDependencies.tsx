@@ -12,6 +12,7 @@ import 'react-complex-tree/lib/style-modern.css';
 import { Badge } from '@/components/ui/badge';
 
 import { isNoChangeVersion } from '@/utils/changelogFilter';
+import { formatDatesInMarkdown } from '@/utils/dateFormatter';
 
 import type { ChangelogVersion } from '@/utils/changelogFilter';
 import type { DependencyTreeNode } from '@/utils/dependencyTreeBuilder';
@@ -112,6 +113,11 @@ export function VersionWithDependencies({ version }: VersionWithDependenciesProp
     return Object.keys(treeItems);
   }, [treeItems]);
 
+  /* Format dates in the version content to human-readable format */
+  const formattedContent = useMemo(() => {
+    return formatDatesInMarkdown(version.content);
+  }, [version.content]);
+
   return (
     <div className="mb-6 last:mb-0 max-w-none">
       <ReactMarkdown
@@ -121,7 +127,7 @@ export function VersionWithDependencies({ version }: VersionWithDependenciesProp
         rehypePlugins={[rehypeRaw, rehypeSanitize]}
         remarkPlugins={[remarkGfm]}
       >
-        {version.content}
+        {formattedContent}
       </ReactMarkdown>
 
       {/* Show dependency tree if this is a "no changes" version */}
@@ -246,7 +252,7 @@ export function VersionWithDependencies({ version }: VersionWithDependenciesProp
                             rehypePlugins={[rehypeRaw, rehypeSanitize]}
                             remarkPlugins={[remarkGfm]}
                           >
-                            {item.data.changelog}
+                            {formatDatesInMarkdown(item.data.changelog)}
                           </ReactMarkdown>
                         </div>
                       </div>
